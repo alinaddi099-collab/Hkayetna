@@ -1,0 +1,1136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hkayetna | Your Story, In a Song</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind CSS (CDN config) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        alabaster: { DEFAULT: '#FFFFFF', dark: '#FAF8F8' },
+                        oxblood: { DEFAULT: '#4A0404', light: '#7A1212', 10: 'rgba(74,4,4,0.1)' },
+                        charcoal: '#1A0505',
+                        rosewood: '#6E5A5A'
+                    },
+                    fontFamily: {
+                        'en-heading': ['"Playfair Display"', 'serif'],
+                        'en-body': ['"Plus Jakarta Sans"', 'sans-serif'],
+                        'ar-heading': ['"Tajawal"', 'sans-serif'],
+                        'ar-body': ['"Cairo"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* iOS 26 Liquid Glass & Physics */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.72);
+            --glass-blur: blur(28px) saturate(180%);
+            --glass-border: 1px solid rgba(74, 4, 4, 0.12);
+            --glass-shadow: 0 20px 50px rgba(74, 4, 4, 0.07);
+        }
+
+        body { background-color: #FAF8F8; color: #1A0505; overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* Bilingual Font Morphing */
+        body.lang-en { font-family: "Plus Jakarta Sans", sans-serif; }
+        body.lang-en .heading-text { font-family: "Playfair Display", serif; }
+        body.lang-ar { font-family: "Cairo", sans-serif; }
+        body.lang-ar .heading-text { font-family: "Tajawal", sans-serif; }
+
+        .glass-panel {
+            background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: var(--glass-border); box-shadow: var(--glass-shadow);
+        }
+        .glass-panel-dark {
+            background: rgba(26, 5, 5, 0.85); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); color: #fff;
+        }
+
+        .glass-btn {
+            background: rgba(74, 4, 4, 0.95); backdrop-filter: var(--glass-blur); box-shadow: 0 10px 30px rgba(74, 4, 4, 0.2);
+            transition: all 450ms cubic-bezier(0.22, 1, 0.36, 1); position: relative; overflow: hidden;
+        }
+        .glass-btn::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: 0.5s;
+        }
+        .glass-btn:hover::after { left: 150%; }
+        
+        .spring-press { transition: all 450ms cubic-bezier(0.22, 1, 0.36, 1); }
+        .spring-press:active { transform: scale(0.95); }
+
+        /* Custom Input Range */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+            background: #4A0404; cursor: pointer; margin-top: -8px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(74,4,4,0.2); border-radius: 2px; }
+
+        /* Ambient Canvas & Logo Watermark */
+        #ambient-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1; }
+        .watermark-pattern {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image: url("logo.jpg"); background-repeat: repeat; background-size: 150px 150px;
+            opacity: 0.04;
+        }
+
+        /* Animations & Utilities */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .vinyl-record { animation: spin 15s linear infinite; }
+        .vinyl-record.paused { animation-play-state: paused; }
+        
+        .eq-bar { width: 4px; border-radius: 2px; background: #4A0404; transition: height 0.1s ease; height: 4px; }
+        .playing .eq-bar:nth-child(1) { animation: eq 1.2s ease-in-out infinite alternate; }
+        .playing .eq-bar:nth-child(2) { animation: eq 0.8s ease-in-out infinite alternate 0.2s; }
+        .playing .eq-bar:nth-child(3) { animation: eq 1s ease-in-out infinite alternate 0.4s; }
+        .playing .eq-bar:nth-child(4) { animation: eq 0.9s ease-in-out infinite alternate 0.1s; }
+        @keyframes eq { 0% { height: 4px; } 100% { height: 24px; } }
+
+        .vault-card { transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); opacity: 1; transform: scale(1); }
+        .vault-card.hidden-item { opacity: 0; transform: scale(0.9); pointer-events: none; position: absolute; }
+
+        .wizard-stage { display: none; opacity: 0; transform: translateX(20px); transition: all 0.4s ease; }
+        .wizard-stage.active { display: block; opacity: 1; transform: translateX(0); }
+
+        .ios-switch { position: relative; display: inline-block; width: 48px; height: 28px; }
+        .ios-switch input { opacity: 0; width: 0; height: 0; }
+        .ios-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .ios-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input:checked + .ios-slider { background-color: #4A0404; }
+        input:checked + .ios-slider:before { transform: translateX(20px); rtl:transform: translateX(-20px); }
+
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        #app-content { transition: opacity 0.3s ease; }
+        
+        /* Gift Box Shake */
+        @keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 75% { transform: rotate(-5deg); } }
+        .hover-shake:hover { animation: shake 0.5s ease-in-out infinite; }
+        @keyframes wiggle { 0% { transform: scale(0.8) rotate(-5deg); opacity: 0;} 50% { transform: scale(1.05) rotate(3deg); opacity: 1;} 100% { transform: scale(1) rotate(0deg);} }
+    </style>
+</head>
+<body class="lang-en antialiased">
+
+    <!-- Ambient Logo Background & Interactive Canvas -->
+    <div class="watermark-pattern"></div>
+    <canvas id="ambient-canvas"></canvas>
+
+    <!-- Main Content wrapper for directional switching -->
+    <div id="app-content" dir="ltr" class="relative z-10">
+
+        <!-- 1. FLOATING iOS 26 LIQUID GLASS NAVBAR -->
+        <nav class="fixed top-4 left-4 right-4 z-50 glass-panel rounded-full px-6 py-3 flex items-center justify-between transition-all">
+            <a href="#" class="flex items-center gap-3 spring-press">
+                <!-- Integrated Brand Logo -->
+                <div class="relative w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg overflow-hidden border-2 border-oxblood">
+                    <img src="logo.jpg" alt="Hkayetna Logo" class="w-full h-full object-cover">
+                </div>
+                <div class="flex flex-col">
+                    <span class="heading-text text-xl font-bold text-oxblood leading-tight tracking-tight">Hkayetna</span>
+                    <span class="text-[9px] uppercase tracking-widest text-rosewood font-semibold" data-i18n="tagline">YOUR STORY, IN A SONG.</span>
+                </div>
+            </a>
+            <div class="hidden lg:flex items-center gap-8 text-sm font-medium text-charcoal">
+                <a href="#vault-section" class="hover:text-oxblood transition-colors" data-i18n="nav_vault">The Vault</a>
+                <a href="#how-it-works" class="hover:text-oxblood transition-colors" data-i18n="nav_how">How It Works</a>
+                <a href="#studio-section" class="hover:text-oxblood transition-colors" data-i18n="nav_studio">Song Studio</a>
+                <a href="#reviews" class="hover:text-oxblood transition-colors" data-i18n="nav_reviews">Reviews</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="lang-toggle" class="glass-panel flex items-center rounded-full p-1 text-xs font-bold text-charcoal spring-press shadow-sm cursor-pointer border-none bg-black/5">
+                    <span class="px-3 py-1.5 rounded-full transition-all duration-300" id="btn-en">EN</span>
+                    <span class="px-3 py-1.5 rounded-full transition-all duration-300" id="btn-ar">عربي</span>
+                </button>
+                <a href="#studio-section" class="hidden md:flex glass-btn text-white px-6 py-2.5 rounded-full text-sm font-semibold spring-press items-center gap-2">
+                    <i data-lucide="music" class="w-4 h-4"></i><span data-i18n="nav_cta">Create Your Song</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- 2. CINEMATIC EDITORIAL HERO SECTION -->
+        <section class="min-h-screen pt-32 pb-20 px-6 flex items-center max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-16 items-center w-full">
+                <!-- Left -->
+                <div class="flex flex-col items-start gap-6 relative z-10">
+                    <div class="glass-panel px-4 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-oxblood uppercase tracking-wider mb-2">
+                        <span>✨</span> <span data-i18n="hero_badge">BESPOKE AUDIO HOUSE • CRAFTED IN LEBANON</span>
+                    </div>
+                    <h1 class="heading-text text-5xl md:text-7xl font-bold text-charcoal leading-[1.1] tracking-tight">
+                        <span data-i18n="hero_headline_1">YOUR STORY.</span><br>
+                        <span class="text-oxblood italic" data-i18n="hero_headline_2">YOUR PERMANENT SOUNDTRACK.</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-rosewood leading-relaxed max-w-lg font-medium" data-i18n="hero_sub">
+                        Transform your personal memories, inside jokes, and milestones into a studio-grade original song. Real emotion, premium composition, starting at just $19.
+                    </p>
+                    <div class="flex flex-wrap gap-4 mt-4 w-full">
+                        <a href="#studio-section" class="glass-btn text-white px-8 py-4 rounded-full text-base font-semibold spring-press flex-1 text-center flex justify-center items-center gap-2 min-w-[250px]">
+                            <span data-i18n="hero_cta_primary">Build Your Soundtrack — From $19</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 rtl:-scale-x-100"></i>
+                        </a>
+                        <a href="#vault-section" class="glass-panel bg-white/50 hover:bg-white/80 text-charcoal px-8 py-4 rounded-full text-base font-semibold spring-press flex items-center justify-center gap-3 transition-all">
+                            <i data-lucide="headphones" class="w-5 h-5 text-oxblood"></i><span data-i18n="hero_cta_secondary">Listen to the Vault</span>
+                        </a>
+                    </div>
+                    <div class="flex flex-wrap gap-3 mt-6">
+                        <div class="flex items-center gap-2 bg-white/40 border border-oxblood/10 px-3 py-1.5 rounded-full text-xs font-semibold text-charcoal backdrop-blur-md">🎙️ <span data-i18n="trust_1">Studio-Grade Vocals</span></div>
+                        <div class="flex items-center gap-2 bg-white/40 border border-oxblood/10 px-3 py-1.5 rounded-full text-xs font-semibold text-charcoal backdrop-blur-md">⚡ <span data-i18n="trust_2">48h–72h Fast Delivery</span></div>
+                        <div class="flex items-center gap-2 bg-white/40 border border-oxblood/10 px-3 py-1.5 rounded-full text-xs font-semibold text-charcoal backdrop-blur-md">💬 <span data-i18n="trust_3">Direct WhatsApp Delivery</span></div>
+                    </div>
+                </div>
+                <!-- Right Vinyl Card -->
+                <div class="relative w-full aspect-square max-w-md mx-auto flex items-center justify-center perspective-1000">
+                    <div class="relative w-full h-full glass-panel rounded-[40px] p-6 flex flex-col items-center justify-center shadow-2xl hover:-translate-y-2 transition-transform duration-500 ease-out cursor-pointer group" data-mp3="" onclick="toggleHeroVinyl(this)">
+                        <div class="w-64 h-64 rounded-full bg-[#111] shadow-[0_10px_30px_rgba(0,0,0,0.5)] flex items-center justify-center relative overflow-hidden vinyl-record paused mb-8 border-4 border-[#222]">
+                            <div class="absolute inset-0 rounded-full border border-white/5 m-2"></div><div class="absolute inset-0 rounded-full border border-white/5 m-6"></div><div class="absolute inset-0 rounded-full border border-white/5 m-10"></div>
+                            <!-- Integrated Brand Logo spinning on Vinyl -->
+                            <div class="w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-inner relative z-10 overflow-hidden border border-[#222]">
+                                <img src="logo.jpg" alt="Vinyl Label" class="w-full h-full object-cover">
+                                <div class="absolute w-3 h-3 bg-white rounded-full shadow-sm border border-gray-300"></div>
+                            </div>
+                            <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 pointer-events-none"></div>
+                        </div>
+                        <div class="w-full bg-white/50 rounded-2xl p-4 flex items-center justify-between backdrop-blur-md border border-white/40">
+                            <div class="flex flex-col text-start">
+                                <span class="font-bold text-charcoal text-sm" data-i18n="hero_song_title">"Forever in Batroun"</span>
+                                <span class="text-xs text-rosewood" data-i18n="hero_song_tag">Acoustic Indie • English</span>
+                            </div>
+                            <button class="w-10 h-10 rounded-full bg-oxblood text-white flex items-center justify-center shadow-lg transition-transform">
+                                <i data-lucide="play" class="w-4 h-4 fill-white hero-play-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SMART GIFT-FINDER -->
+        <section class="px-6 mb-20 -mt-10 relative z-20">
+            <div class="max-w-5xl mx-auto glass-panel rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-white/50">
+                <div class="flex flex-col text-start md:w-1/3">
+                    <h3 class="font-bold text-charcoal" data-i18n="gift_title">Not sure where to start?</h3>
+                    <p class="text-xs text-rosewood mt-1" data-i18n="gift_sub">Pick the recipient & vibe, we'll guide you.</p>
+                </div>
+                <div class="flex-1 flex flex-col sm:flex-row gap-4 w-full">
+                    <div class="flex-1 relative">
+                        <select id="gift-who" class="w-full appearance-none bg-white/60 border border-oxblood/10 rounded-xl px-4 py-3 text-sm font-medium text-charcoal focus:outline-none focus:ring-2 focus:ring-oxblood/50 cursor-pointer spring-press">
+                            <option value="" disabled selected data-i18n="gift_who_placeholder">Who is it for?</option>
+                            <option value="love" data-i18n="gift_who_love">Partner / Love</option>
+                            <option value="birthday" data-i18n="gift_who_bday">Birthday (Friends)</option>
+                            <option value="family" data-i18n="gift_who_family">Mother / Family</option>
+                            <option value="wedding" data-i18n="gift_who_wedding">Wedding Couple</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-4 top-3.5 w-4 h-4 text-rosewood pointer-events-none rtl:right-auto rtl:left-4"></i>
+                    </div>
+                    <div class="flex-1 relative">
+                        <select id="gift-vibe" class="w-full appearance-none bg-white/60 border border-oxblood/10 rounded-xl px-4 py-3 text-sm font-medium text-charcoal focus:outline-none focus:ring-2 focus:ring-oxblood/50 cursor-pointer spring-press">
+                            <option value="" disabled selected data-i18n="gift_vibe_placeholder">What's the vibe?</option>
+                            <option value="acoustic" data-i18n="gift_vibe_acoustic">Acoustic / Emotional</option>
+                            <option value="pop" data-i18n="gift_vibe_pop">Upbeat Pop / Dance</option>
+                            <option value="tarab" data-i18n="gift_vibe_tarab">Tarab / Classic Lebanese</option>
+                            <option value="cinematic" data-i18n="gift_vibe_cinematic">Cinematic / Grand</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-4 top-3.5 w-4 h-4 text-rosewood pointer-events-none rtl:right-auto rtl:left-4"></i>
+                    </div>
+                </div>
+                <button onclick="handleGiftFinder()" class="bg-oxblood text-white px-6 py-3 rounded-xl text-sm font-semibold spring-press whitespace-nowrap flex items-center gap-2 hover:bg-oxblood-light transition-colors">
+                    <span data-i18n="gift_btn">Configure Now</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 rtl:-scale-x-100"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 4. THE VAULT -->
+        <section id="vault-section" class="py-20 px-6 relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="heading-text text-4xl md:text-5xl font-bold text-charcoal mb-4" data-i18n="vault_title">The Vault</h2>
+                    <p class="text-rosewood font-medium max-w-2xl mx-auto" data-i18n="vault_sub">Listen to how we turn messy, beautiful human memories into professionally produced music.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-3 mb-12" id="vault-filters">
+                    <button data-filter="all" class="filter-btn active-filter glass-panel bg-oxblood text-white px-5 py-2 rounded-full text-sm font-semibold spring-press" data-i18n="filter_all">All</button>
+                    <button data-filter="love" class="filter-btn glass-panel px-5 py-2 rounded-full text-sm font-medium text-charcoal hover:bg-white spring-press" data-i18n="filter_love">Love & Weddings</button>
+                    <button data-filter="tarab" class="filter-btn glass-panel px-5 py-2 rounded-full text-sm font-medium text-charcoal hover:bg-white spring-press" data-i18n="filter_tarab">Tarab & Lebanese</button>
+                    <button data-filter="family" class="filter-btn glass-panel px-5 py-2 rounded-full text-sm font-medium text-charcoal hover:bg-white spring-press" data-i18n="filter_family">Family & Mom</button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 relative min-h-[400px]" id="vault-grid">
+                    
+                    <div class="vault-card glass-panel rounded-3xl p-2 flex flex-col group border border-white/60 shadow-xl" data-category="love">
+                        <div class="bg-alabaster-dark rounded-[24px] p-6 mb-2 relative">
+                            <i data-lucide="quote" class="w-8 h-8 text-oxblood/20 absolute top-4 right-4 rtl:left-4 rtl:right-auto"></i>
+                            <div class="text-xs font-bold text-oxblood uppercase tracking-wider mb-3 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-oxblood animate-pulse"></div><span data-i18n="vault_before">Client Note</span></div>
+                            <p class="text-charcoal font-medium italic text-sm leading-relaxed" data-i18n="vault_c1_prompt">"Mention our late-night coffee drives to Batroun..."</p>
+                        </div>
+                        <div class="bg-white/40 rounded-[24px] p-6 flex flex-col gap-4 backdrop-blur-md border border-white/50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex flex-col text-start">
+                                    <h4 class="font-bold text-charcoal text-lg" data-i18n="vault_c1_title">The Grey Hoodie</h4>
+                                    <span class="text-xs font-medium text-rosewood bg-white/50 px-2 py-1 rounded-md inline-block mt-1 w-fit" data-i18n="vault_c1_tag">Acoustic Pop • English</span>
+                                </div>
+                                <button data-mp3="" class="play-btn w-12 h-12 rounded-full bg-oxblood text-white flex items-center justify-center shadow-lg spring-press shrink-0" onclick="toggleAudio(this)"><i data-lucide="play" class="w-5 h-5 fill-white play-icon"></i></button>
+                            </div>
+                            <div class="audio-visualizer flex items-center justify-center gap-1 h-6 bg-oxblood/5 rounded-xl px-4 py-1"><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="vault-card glass-panel rounded-3xl p-2 flex flex-col group border border-white/60 shadow-xl" data-category="tarab">
+                        <div class="bg-alabaster-dark rounded-[24px] p-6 mb-2 relative">
+                            <i data-lucide="quote" class="w-8 h-8 text-oxblood/20 absolute top-4 right-4 rtl:left-4 rtl:right-auto"></i>
+                            <div class="text-xs font-bold text-oxblood uppercase tracking-wider mb-3 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-oxblood animate-pulse"></div><span data-i18n="vault_before">Client Note</span></div>
+                            <p class="text-charcoal font-medium italic text-sm leading-relaxed" data-i18n="vault_c2_prompt">"My dad is retiring after 40 years. He loves old Fairouz songs..."</p>
+                        </div>
+                        <div class="bg-white/40 rounded-[24px] p-6 flex flex-col gap-4 backdrop-blur-md border border-white/50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex flex-col text-start">
+                                    <h4 class="font-bold text-charcoal text-lg" data-i18n="vault_c2_title">Tawlet Zahr</h4>
+                                    <span class="text-xs font-medium text-rosewood bg-white/50 px-2 py-1 rounded-md inline-block mt-1 w-fit" data-i18n="vault_c2_tag">Classic Tarab • Arabic</span>
+                                </div>
+                                <button data-mp3="" class="play-btn w-12 h-12 rounded-full bg-oxblood text-white flex items-center justify-center shadow-lg spring-press shrink-0" onclick="toggleAudio(this)"><i data-lucide="play" class="w-5 h-5 fill-white play-icon"></i></button>
+                            </div>
+                            <div class="audio-visualizer flex items-center justify-center gap-1 h-6 bg-oxblood/5 rounded-xl px-4 py-1"><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="vault-card glass-panel rounded-3xl p-2 flex flex-col group border border-white/60 shadow-xl" data-category="family">
+                        <div class="bg-alabaster-dark rounded-[24px] p-6 mb-2 relative">
+                            <i data-lucide="quote" class="w-8 h-8 text-oxblood/20 absolute top-4 right-4 rtl:left-4 rtl:right-auto"></i>
+                            <div class="text-xs font-bold text-oxblood uppercase tracking-wider mb-3 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-oxblood animate-pulse"></div><span data-i18n="vault_before">Client Note</span></div>
+                            <p class="text-charcoal font-medium italic text-sm leading-relaxed" data-i18n="vault_c3_prompt">"For our newborn daughter, Yara. Include the feeling of holding her small hands..."</p>
+                        </div>
+                        <div class="bg-white/40 rounded-[24px] p-6 flex flex-col gap-4 backdrop-blur-md border border-white/50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex flex-col text-start">
+                                    <h4 class="font-bold text-charcoal text-lg" data-i18n="vault_c3_title">Yara's Shield</h4>
+                                    <span class="text-xs font-medium text-rosewood bg-white/50 px-2 py-1 rounded-md inline-block mt-1 w-fit" data-i18n="vault_c3_tag">Lullaby Strings • Bilingual</span>
+                                </div>
+                                <button data-mp3="" class="play-btn w-12 h-12 rounded-full bg-oxblood text-white flex items-center justify-center shadow-lg spring-press shrink-0" onclick="toggleAudio(this)"><i data-lucide="play" class="w-5 h-5 fill-white play-icon"></i></button>
+                            </div>
+                            <div class="audio-visualizer flex items-center justify-center gap-1 h-6 bg-oxblood/5 rounded-xl px-4 py-1"><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="vault-card glass-panel rounded-3xl p-2 flex flex-col group border border-white/60 shadow-xl" data-category="birthday">
+                        <div class="bg-alabaster-dark rounded-[24px] p-6 mb-2 relative">
+                            <i data-lucide="quote" class="w-8 h-8 text-oxblood/20 absolute top-4 right-4 rtl:left-4 rtl:right-auto"></i>
+                            <div class="text-xs font-bold text-oxblood uppercase tracking-wider mb-3 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-oxblood animate-pulse"></div><span data-i18n="vault_before">Client Note</span></div>
+                            <p class="text-charcoal font-medium italic text-sm leading-relaxed" data-i18n="vault_c4_prompt">"My sister is graduating med school at AUB. Make it an upbeat pop anthem..."</p>
+                        </div>
+                        <div class="bg-white/40 rounded-[24px] p-6 flex flex-col gap-4 backdrop-blur-md border border-white/50">
+                            <div class="flex items-center justify-between">
+                                <div class="flex flex-col text-start">
+                                    <h4 class="font-bold text-charcoal text-lg" data-i18n="vault_c4_title">Surgeon's Anthem</h4>
+                                    <span class="text-xs font-medium text-rosewood bg-white/50 px-2 py-1 rounded-md inline-block mt-1 w-fit" data-i18n="vault_c4_tag">Upbeat Pop • English</span>
+                                </div>
+                                <button data-mp3="" class="play-btn w-12 h-12 rounded-full bg-oxblood text-white flex items-center justify-center shadow-lg spring-press shrink-0" onclick="toggleAudio(this)"><i data-lucide="play" class="w-5 h-5 fill-white play-icon"></i></button>
+                            </div>
+                            <div class="audio-visualizer flex items-center justify-center gap-1 h-6 bg-oxblood/5 rounded-xl px-4 py-1"><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- PART B: HOW IT WORKS -->
+        <section id="how-it-works" class="py-20 px-6 relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="heading-text text-4xl font-bold text-charcoal mb-4" data-i18n="hw_title">How It Works</h2>
+                    <p class="text-rosewood font-medium" data-i18n="hw_sub">Four simple steps to your permanent soundtrack.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col items-start relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 text-8xl font-black text-oxblood/5 pointer-events-none group-hover:scale-110 transition-transform">01</div>
+                        <i data-lucide="settings-2" class="w-8 h-8 text-oxblood mb-4"></i>
+                        <h4 class="font-bold text-charcoal mb-2" data-i18n="hw_s1_title">Configure Sound</h4>
+                        <p class="text-sm text-rosewood" data-i18n="hw_s1_desc">Pick your canvas ($19 or $34), vibe, and vocal style.</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col items-start relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 text-8xl font-black text-oxblood/5 pointer-events-none group-hover:scale-110 transition-transform">02</div>
+                        <i data-lucide="message-square-heart" class="w-8 h-8 text-oxblood mb-4"></i>
+                        <h4 class="font-bold text-charcoal mb-2" data-i18n="hw_s2_title">Share Memories</h4>
+                        <p class="text-sm text-rosewood" data-i18n="hw_s2_desc">Type key moments or send a quick WhatsApp voice note.</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col items-start relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 text-8xl font-black text-oxblood/5 pointer-events-none group-hover:scale-110 transition-transform">03</div>
+                        <i data-lucide="pen-tool" class="w-8 h-8 text-oxblood mb-4"></i>
+                        <h4 class="font-bold text-charcoal mb-2" data-i18n="hw_s3_title">Approve Lyrics</h4>
+                        <p class="text-sm text-rosewood" data-i18n="hw_s3_desc">We write and send custom lyrics for approval before recording.</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col items-start relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 text-8xl font-black text-oxblood/5 pointer-events-none group-hover:scale-110 transition-transform">04</div>
+                        <i data-lucide="gift" class="w-8 h-8 text-oxblood mb-4"></i>
+                        <h4 class="font-bold text-charcoal mb-2" data-i18n="hw_s4_title">Unwrap Masterpiece</h4>
+                        <p class="text-sm text-rosewood" data-i18n="hw_s4_desc">Receive your studio-grade song in 48h–72h via WhatsApp.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART C: THE 5-STAGE INTERACTIVE SONG STUDIO -->
+        <section id="studio-section" class="py-20 px-6 relative z-10 scroll-mt-20">
+            <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-10 items-start">
+                
+                <div class="w-full lg:w-7/12 flex flex-col gap-6">
+                    <div class="glass-panel rounded-full p-2 flex overflow-x-auto hide-scrollbars no-scrollbar">
+                        <div class="flex gap-2 min-w-max mx-auto" id="wizard-nav">
+                            <button type="button" onclick="goToStage(1)" class="wz-nav-btn active bg-oxblood text-white px-4 py-2 rounded-full text-xs font-semibold spring-press transition-colors"><span data-i18n="wz_nav_1">1. Canvas</span></button>
+                            <button type="button" onclick="goToStage(2)" class="wz-nav-btn text-rosewood hover:text-oxblood px-4 py-2 rounded-full text-xs font-semibold spring-press transition-colors"><span data-i18n="wz_nav_2">2. Sound</span></button>
+                            <button type="button" onclick="goToStage(3)" class="wz-nav-btn text-rosewood hover:text-oxblood px-4 py-2 rounded-full text-xs font-semibold spring-press transition-colors"><span data-i18n="wz_nav_3">3. Story</span></button>
+                            <button type="button" onclick="goToStage(4)" class="wz-nav-btn text-rosewood hover:text-oxblood px-4 py-2 rounded-full text-xs font-semibold spring-press transition-colors"><span data-i18n="wz_nav_4">4. Upgrades</span></button>
+                            <button type="button" onclick="goToStage(5)" class="wz-nav-btn text-rosewood hover:text-oxblood px-4 py-2 rounded-full text-xs font-semibold spring-press transition-colors"><span data-i18n="wz_nav_5">5. Review</span></button>
+                        </div>
+                    </div>
+
+                    <form id="studio-form" class="glass-panel rounded-3xl p-6 md:p-10 shadow-xl border border-white/60 relative overflow-hidden min-h-[500px]">
+                        
+                        <!-- STAGE 1 -->
+                        <div id="stage-1" class="wizard-stage active">
+                            <h3 class="heading-text text-2xl font-bold text-charcoal mb-6" data-i18n="stg1_title">1. Base Canvas & Occasion</h3>
+                            <div class="flex flex-col gap-4 mb-8">
+                                <label class="cursor-pointer group relative">
+                                    <input type="radio" name="baseCanvas" value="19" class="peer sr-only">
+                                    <div class="glass-panel p-4 rounded-2xl border-2 border-transparent peer-checked:border-oxblood peer-checked:bg-oxblood/5 transition-all">
+                                        <div class="flex justify-between items-center mb-1"><h4 class="font-bold text-charcoal" data-i18n="stg1_canvas1_title">The Spark ($19)</h4><div class="w-4 h-4 rounded-full border-2 border-rosewood/50 peer-checked:group-[]:border-oxblood peer-checked:group-[]:bg-oxblood flex items-center justify-center"><div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:group-[]:opacity-100"></div></div></div>
+                                        <p class="text-sm text-rosewood" data-i18n="stg1_canvas1_desc">1.5-Min Custom Song • Core memories • Studio MP3</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group relative">
+                                    <input type="radio" name="baseCanvas" value="34" class="peer sr-only" checked>
+                                    <div class="glass-panel p-4 rounded-2xl border-2 border-transparent peer-checked:border-oxblood peer-checked:bg-oxblood/5 transition-all relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 bg-oxblood text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase" data-i18n="badge_popular">MOST POPULAR</div>
+                                        <div class="flex justify-between items-center mb-1"><h4 class="font-bold text-charcoal" data-i18n="stg1_canvas2_title">The Full Soundtrack ($34)</h4><div class="w-4 h-4 rounded-full border-2 border-oxblood bg-oxblood flex items-center justify-center ring-2 ring-oxblood/20 ring-offset-2"><div class="w-2 h-2 bg-white rounded-full"></div></div></div>
+                                        <p class="text-sm text-rosewood" data-i18n="stg1_canvas2_desc">3-Min Complete Song • Verses, Chorus, Bridge • Deep story</p>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group relative">
+                                    <input type="radio" name="baseCanvas" value="55" class="peer sr-only">
+                                    <div class="glass-panel p-4 rounded-2xl border-2 border-transparent peer-checked:border-oxblood peer-checked:bg-oxblood/5 transition-all">
+                                        <div class="flex justify-between items-center mb-1"><h4 class="font-bold text-charcoal" data-i18n="stg1_canvas3_title">Brand Anthem ($55)</h4><div class="w-4 h-4 rounded-full border-2 border-rosewood/50 peer-checked:group-[]:border-oxblood peer-checked:group-[]:bg-oxblood flex items-center justify-center"><div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:group-[]:opacity-100"></div></div></div>
+                                        <p class="text-sm text-rosewood" data-i18n="stg1_canvas3_desc">Sonic identity, jingle, or promo audio for business</p>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <p class="font-bold text-charcoal mb-3 text-sm" data-i18n="stg1_occ_title">Who is this for?</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                                <label class="cursor-pointer text-center"><input type="radio" name="occasion" value="Partner/Love" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-charcoal transition-all" data-i18n="occ_love">Partner / Love</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="occasion" value="Wedding" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-charcoal transition-all" data-i18n="occ_wedding">Wedding</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="occasion" value="Birthday" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-charcoal transition-all" data-i18n="occ_bday">Birthday</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="occasion" value="Mother/Father" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-charcoal transition-all" data-i18n="occ_parents">Mother/Father</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="occasion" value="Graduation" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-charcoal transition-all" data-i18n="occ_grad">Graduation</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="occasion" value="Friend" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-charcoal transition-all" data-i18n="occ_friend">Friend</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="occasion" value="Baby" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-charcoal transition-all" data-i18n="occ_baby">Newborn</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="occasion" value="Brand" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-charcoal transition-all" data-i18n="occ_brand">Business</div></label>
+                            </div>
+
+                            <div class="flex flex-col gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-charcoal mb-1" data-i18n="stg1_rec_label">Recipient's Name</label>
+                                    <input type="text" id="recipientName" class="w-full bg-white/60 border border-rosewood/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-oxblood/50" data-i18n-placeholder="stg1_rec_placeholder" placeholder="e.g., Sarah, Mom, Rami & Nour">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-charcoal mb-1" data-i18n="stg1_title_label">Custom Song Title (Optional)</label>
+                                    <input type="text" id="songTitle" class="w-full bg-white/60 border border-rosewood/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-oxblood/50" data-i18n-placeholder="stg1_title_placeholder" placeholder="We can also name it for you!">
+                                </div>
+                            </div>
+                            <div class="mt-8 flex justify-end"><button type="button" onclick="goToStage(2)" class="glass-btn text-white px-6 py-2.5 rounded-full text-sm font-semibold spring-press" data-i18n="btn_next">Next Step →</button></div>
+                        </div>
+
+                        <!-- STAGE 2 -->
+                        <div id="stage-2" class="wizard-stage">
+                            <h3 class="heading-text text-2xl font-bold text-charcoal mb-6" data-i18n="stg2_title">2. Sound & Vibe</h3>
+                            <p class="font-bold text-charcoal mb-2 text-sm" data-i18n="stg2_lang">Language</p>
+                            <div class="grid grid-cols-2 gap-3 mb-6">
+                                <label class="cursor-pointer"><input type="radio" name="lang" value="Lebanese Arabic" class="peer sr-only" checked><div class="glass-panel py-3 px-4 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-sm font-medium text-center transition-all" data-i18n="lang_ar">Lebanese Arabic</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="lang" value="English" class="peer sr-only"><div class="glass-panel py-3 px-4 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-sm font-medium text-center transition-all" data-i18n="lang_en">English</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="lang" value="French" class="peer sr-only"><div class="glass-panel py-3 px-4 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-sm font-medium text-center transition-all" data-i18n="lang_fr">French</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="lang" value="Bilingual Mix (+$6)" data-cost="6" class="peer sr-only"><div class="glass-panel py-3 px-4 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-sm font-medium text-center transition-all"><span data-i18n="lang_mix">Bilingual / Franco</span> (+$6)</div></label>
+                            </div>
+                            <p class="font-bold text-charcoal mb-2 text-sm" data-i18n="stg2_vocal">Vocal Style</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                                <label class="cursor-pointer"><input type="radio" name="vocal" value="Male" class="peer sr-only" checked><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-center transition-all" data-i18n="voc_m">Male (Free)</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="vocal" value="Female" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-center transition-all" data-i18n="voc_f">Female (Free)</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="vocal" value="Duet (+$8)" data-cost="8" class="peer sr-only"><div class="glass-panel py-3 px-2 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-medium text-center transition-all"><span data-i18n="voc_d">Duet</span> (+$8)</div></label>
+                            </div>
+                            <p class="font-bold text-charcoal mb-2 text-sm" data-i18n="stg2_genre">Musical Genre</p>
+                            <div class="flex flex-wrap gap-2 mb-8">
+                                <label class="cursor-pointer"><input type="radio" name="genre" value="Acoustic Warmth" class="peer sr-only" checked><div class="glass-panel py-2 px-4 rounded-full border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood peer-checked:text-white text-xs font-medium transition-all" data-i18n="gen_ac">Acoustic Warmth</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="genre" value="Lebanese Tarab" class="peer sr-only"><div class="glass-panel py-2 px-4 rounded-full border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood peer-checked:text-white text-xs font-medium transition-all" data-i18n="gen_tar">Lebanese Tarab</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="genre" value="Upbeat Pop" class="peer sr-only"><div class="glass-panel py-2 px-4 rounded-full border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood peer-checked:text-white text-xs font-medium transition-all" data-i18n="gen_pop">Upbeat Pop</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="genre" value="Cinematic Strings" class="peer sr-only"><div class="glass-panel py-2 px-4 rounded-full border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood peer-checked:text-white text-xs font-medium transition-all" data-i18n="gen_cin">Cinematic Strings</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="genre" value="Indie Chill" class="peer sr-only"><div class="glass-panel py-2 px-4 rounded-full border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood peer-checked:text-white text-xs font-medium transition-all" data-i18n="gen_ind">Indie / Chill</div></label>
+                            </div>
+                            <p class="font-bold text-charcoal mb-4 text-sm" data-i18n="stg2_sliders">Emotion & Energy</p>
+                            <div class="glass-panel p-4 rounded-2xl mb-4">
+                                <div class="flex justify-between text-xs text-rosewood mb-2 font-medium"><span data-i18n="sl_mood_1">Tears 🥺</span><span data-i18n="sl_mood_2">Balanced ✨</span><span data-i18n="sl_mood_3">Hype 🔥</span></div>
+                                <input type="range" id="mood-slider" min="0" max="100" value="50" class="w-full">
+                            </div>
+                            <div class="glass-panel p-4 rounded-2xl">
+                                <div class="flex justify-between text-xs text-rosewood mb-2 font-medium"><span data-i18n="sl_temp_1">Slow 🕯️</span><span data-i18n="sl_temp_2">Groove 🎶</span><span data-i18n="sl_temp_3">Fast 💃</span></div>
+                                <input type="range" id="tempo-slider" min="0" max="100" value="50" class="w-full">
+                            </div>
+                            <div class="mt-8 flex justify-between">
+                                <button type="button" onclick="goToStage(1)" class="text-sm font-medium text-rosewood hover:text-oxblood" data-i18n="btn_back">← Back</button>
+                                <button type="button" onclick="goToStage(3)" class="glass-btn text-white px-6 py-2.5 rounded-full text-sm font-semibold spring-press" data-i18n="btn_next">Next Step →</button>
+                            </div>
+                        </div>
+
+                        <!-- STAGE 3 -->
+                        <div id="stage-3" class="wizard-stage">
+                            <h3 class="heading-text text-2xl font-bold text-charcoal mb-6" data-i18n="stg3_title">3. Your Story</h3>
+                            <div class="flex bg-white/40 rounded-xl p-1 mb-6 border border-white/50">
+                                <button type="button" onclick="toggleStoryMode('text')" id="tab-text" class="flex-1 py-2 rounded-lg text-sm font-bold bg-white text-oxblood shadow transition-all">✍️ <span data-i18n="stg3_tab_text">Type Details</span></button>
+                                <button type="button" onclick="toggleStoryMode('voice')" id="tab-voice" class="flex-1 py-2 rounded-lg text-sm font-medium text-rosewood hover:text-charcoal transition-all">🎙️ <span data-i18n="stg3_tab_voice">Voice Note</span></button>
+                            </div>
+                            <div id="story-text-area" class="block">
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <button type="button" onclick="addSpark('spark_1_prompt')" class="glass-panel px-3 py-1 rounded-full text-[10px] font-medium text-oxblood hover:bg-oxblood hover:text-white transition-colors" data-i18n="spark_1">+ Where did you meet?</button>
+                                    <button type="button" onclick="addSpark('spark_2_prompt')" class="glass-panel px-3 py-1 rounded-full text-[10px] font-medium text-oxblood hover:bg-oxblood hover:text-white transition-colors" data-i18n="spark_2">+ Inside joke?</button>
+                                    <button type="button" onclick="addSpark('spark_3_prompt')" class="glass-panel px-3 py-1 rounded-full text-[10px] font-medium text-oxblood hover:bg-oxblood hover:text-white transition-colors" data-i18n="spark_3">+ Funny habit?</button>
+                                </div>
+                                <textarea id="storyInput" rows="5" class="w-full bg-white/60 border border-rosewood/20 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-oxblood/50 mb-4" data-i18n-placeholder="stg3_story_ph" placeholder="Tell us everything..."></textarea>
+                            </div>
+                            <div id="story-voice-area" class="hidden glass-panel p-6 rounded-2xl border-dashed border-2 border-oxblood/30 text-center mb-4">
+                                <i data-lucide="mic" class="w-8 h-8 text-oxblood mx-auto mb-2 animate-pulse"></i>
+                                <h4 class="font-bold text-charcoal text-sm mb-1" data-i18n="stg3_vn_title">Send a Voice Note</h4>
+                                <p class="text-xs text-rosewood" data-i18n="stg3_vn_desc">Skip typing! At checkout, we'll open WhatsApp so you can comfortably record your memories via voice.</p>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-xs font-bold text-charcoal mb-1" data-i18n="stg3_tags_title">Must-Mention Words (Nicknames, Places, Dates)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="tagInput" class="flex-1 bg-white/60 border border-rosewood/20 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-oxblood/50" data-i18n-placeholder="stg3_tags_ph" placeholder="e.g., Batroun, May 14...">
+                                    <button type="button" onclick="addTag()" class="glass-panel bg-oxblood text-white px-4 py-2 rounded-xl text-sm font-semibold spring-press">+</button>
+                                </div>
+                                <div id="tags-container" class="flex flex-wrap gap-2 mt-3"></div>
+                            </div>
+                            <div class="glass-panel p-4 rounded-xl flex items-center justify-between">
+                                <div class="flex flex-col pr-4">
+                                    <span class="text-sm font-bold text-charcoal" data-i18n="stg3_ded_title">🎁 Free Voice Dedication</span>
+                                    <span class="text-xs text-rosewood" data-i18n="stg3_ded_desc">Add your own 5-sec voice memo at the very start.</span>
+                                </div>
+                                <label class="ios-switch shrink-0"><input type="checkbox" id="dedicationToggle"><span class="ios-slider"></span></label>
+                            </div>
+                            <div class="mt-8 flex justify-between">
+                                <button type="button" onclick="goToStage(2)" class="text-sm font-medium text-rosewood hover:text-oxblood" data-i18n="btn_back">← Back</button>
+                                <button type="button" onclick="goToStage(4)" class="glass-btn text-white px-6 py-2.5 rounded-full text-sm font-semibold spring-press" data-i18n="btn_next">Next Step →</button>
+                            </div>
+                        </div>
+
+                        <!-- STAGE 4 -->
+                        <div id="stage-4" class="wizard-stage">
+                            <h3 class="heading-text text-2xl font-bold text-charcoal mb-6" data-i18n="stg4_title">4. Enhancements & Speed</h3>
+                            <p class="font-bold text-charcoal mb-3 text-sm" data-i18n="stg4_upg_title">Visual Add-Ons</p>
+                            <div class="flex flex-col gap-3 mb-8">
+                                <label class="cursor-pointer group">
+                                    <input type="checkbox" class="upgrade-cb peer sr-only" value="Lyric Poster" data-cost="7" data-i18n-val="upg_1_name">
+                                    <div class="glass-panel p-4 rounded-xl border-2 border-transparent peer-checked:border-oxblood peer-checked:bg-oxblood/5 flex items-center justify-between transition-all">
+                                        <div class="flex flex-col"><span class="font-bold text-charcoal text-sm" data-i18n="upg_1_title">Vinyl & Frame Printable Poster</span><span class="text-xs text-rosewood" data-i18n="upg_1_desc">High-res lyric sheet with scannable QR.</span></div><span class="font-bold text-oxblood text-sm">+$7</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group">
+                                    <input type="checkbox" class="upgrade-cb peer sr-only" value="Cover Art" data-cost="12" data-i18n-val="upg_2_name">
+                                    <div class="glass-panel p-4 rounded-xl border-2 border-transparent peer-checked:border-oxblood peer-checked:bg-oxblood/5 flex items-center justify-between transition-all">
+                                        <div class="flex flex-col"><span class="font-bold text-charcoal text-sm" data-i18n="upg_2_title">Bespoke Album Cover Art</span><span class="text-xs text-rosewood" data-i18n="upg_2_desc">Custom Spotify-style art from your photo.</span></div><span class="font-bold text-oxblood text-sm">+$12</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group relative">
+                                    <input type="checkbox" class="upgrade-cb peer sr-only" value="Cinema Montage" data-cost="18" data-i18n-val="upg_3_name">
+                                    <div class="glass-panel p-4 rounded-xl border-2 border-transparent peer-checked:border-oxblood peer-checked:bg-oxblood/5 flex items-center justify-between transition-all overflow-hidden">
+                                        <div class="absolute top-0 right-0 bg-oxblood text-white text-[9px] font-bold px-2 py-0.5 rounded-bl uppercase" data-i18n="badge_best">BEST GIFT</div>
+                                        <div class="flex flex-col pr-12"><span class="font-bold text-charcoal text-sm" data-i18n="upg_3_title">Cinema Memories Video Montage</span><span class="text-xs text-rosewood" data-i18n="upg_3_desc">Pro Reel/TikTok edit syncing photos & lyrics.</span></div><span class="font-bold text-oxblood text-sm z-10">+$18</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <p class="font-bold text-charcoal mb-3 text-sm" data-i18n="stg4_speed_title">Delivery Speed</p>
+                            <div class="flex flex-col gap-3">
+                                <label class="cursor-pointer group"><input type="radio" name="speed" value="Standard" data-cost="0" class="peer sr-only" checked><div class="glass-panel p-3 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 flex justify-between text-sm transition-all"><span class="font-medium text-charcoal" data-i18n="spd_1">Standard (3–4 Days)</span><span class="font-bold text-oxblood" data-i18n="spd_free">FREE</span></div></label>
+                                <label class="cursor-pointer group"><input type="radio" name="speed" value="Express" data-cost="9" class="peer sr-only"><div class="glass-panel p-3 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 flex justify-between text-sm transition-all"><span class="font-medium text-charcoal" data-i18n="spd_2">Express (48 Hours)</span><span class="font-bold text-oxblood">+$9</span></div></label>
+                                <label class="cursor-pointer group"><input type="radio" name="speed" value="VIP Rush" data-cost="19" class="peer sr-only"><div class="glass-panel p-3 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 flex justify-between text-sm transition-all"><span class="font-medium text-charcoal" data-i18n="spd_3">VIP Rush (24 Hours)</span><span class="font-bold text-oxblood">+$19</span></div></label>
+                            </div>
+                            <div class="mt-8 flex justify-between">
+                                <button type="button" onclick="goToStage(3)" class="text-sm font-medium text-rosewood hover:text-oxblood" data-i18n="btn_back">← Back</button>
+                                <button type="button" onclick="goToStage(5)" class="glass-btn text-white px-6 py-2.5 rounded-full text-sm font-semibold spring-press" data-i18n="btn_next">Next Step →</button>
+                            </div>
+                        </div>
+
+                        <!-- STAGE 5 -->
+                        <div id="stage-5" class="wizard-stage">
+                            <h3 class="heading-text text-2xl font-bold text-charcoal mb-6" data-i18n="stg5_title">5. Final Details</h3>
+                            <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label class="block text-xs font-bold text-charcoal mb-1" data-i18n="stg5_name">Your Name</label>
+                                    <input type="text" id="customerName" class="w-full bg-white/60 border border-rosewood/20 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-oxblood/50" data-i18n-placeholder="stg5_name_ph" placeholder="John Doe">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-charcoal mb-1" data-i18n="stg5_wa">WhatsApp Number</label>
+                                    <input type="text" id="customerPhone" class="w-full bg-white/60 border border-rosewood/20 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-oxblood/50" placeholder="+961 71 817 340">
+                                </div>
+                            </div>
+                            <p class="font-bold text-charcoal mb-2 text-sm" data-i18n="stg5_pay_title">Preferred Payment (Lebanon)</p>
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                <label class="cursor-pointer text-center"><input type="radio" name="payment" value="Whish" class="peer sr-only" checked><div class="glass-panel py-2 px-1 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-bold text-charcoal transition-all">Whish</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="payment" value="OMT" class="peer sr-only"><div class="glass-panel py-2 px-1 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-bold text-charcoal transition-all">OMT</div></label>
+                                <label class="cursor-pointer text-center"><input type="radio" name="payment" value="Cash" class="peer sr-only"><div class="glass-panel py-2 px-1 rounded-xl border border-white/50 peer-checked:border-oxblood peer-checked:bg-oxblood/10 text-xs font-bold text-charcoal transition-all">Cash/NEO</div></label>
+                            </div>
+                            <div class="bg-oxblood/5 rounded-xl p-3 flex items-start gap-2 mb-8 border border-oxblood/10">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-oxblood mt-0.5 shrink-0"></i>
+                                <p class="text-[11px] text-oxblood font-medium leading-tight" data-i18n="stg5_trust">Zero upfront charge. Submit your request below, and we'll confirm your story on WhatsApp before any payment.</p>
+                            </div>
+                            <div class="flex flex-col gap-3">
+                                <button type="button" onclick="submitOrder('whatsapp')" class="glass-btn text-white w-full py-4 rounded-xl text-base font-bold spring-press flex items-center justify-center gap-2">
+                                    <i data-lucide="send" class="w-5 h-5 rtl:-scale-x-100"></i><span data-i18n="btn_wa">Send Order to WhatsApp</span>
+                                </button>
+                                <button type="button" onclick="submitOrder('email')" class="bg-white/60 border border-oxblood/20 text-charcoal w-full py-3 rounded-xl text-sm font-semibold hover:bg-white transition-colors flex items-center justify-center gap-2">
+                                    <i data-lucide="mail" class="w-4 h-4"></i><span data-i18n="btn_email">Or send via Email</span>
+                                </button>
+                            </div>
+                            <div class="mt-6 flex justify-start">
+                                <button type="button" onclick="goToStage(4)" class="text-sm font-medium text-rosewood hover:text-oxblood" data-i18n="btn_back">← Back</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- RIGHT STICKY COLUMN: Live Preview -->
+                <div class="w-full lg:w-5/12 lg:sticky lg:top-32 flex flex-col gap-6">
+                    <div class="glass-panel rounded-3xl p-6 shadow-xl border border-white/60 flex flex-col items-center justify-center overflow-hidden relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-oxblood/5 to-transparent pointer-events-none"></div>
+                        <h4 class="text-xs font-bold text-oxblood uppercase tracking-wider mb-6 relative z-10" data-i18n="preview_title">Live Studio Preview</h4>
+                        
+                        <div class="relative w-48 h-48 mb-4">
+                            <!-- Spinning record poking out with Logo inside -->
+                            <div class="absolute top-0 -right-8 w-48 h-48 rounded-full bg-[#111] shadow-lg flex items-center justify-center vinyl-record rtl:-left-8 rtl:right-auto border border-[#222]">
+                                <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center overflow-hidden relative z-10 border border-[#222]">
+                                    <img src="logo.jpg" alt="Label" class="w-full h-full object-cover">
+                                    <div class="absolute w-2 h-2 bg-white rounded-full shadow-sm"></div>
+                                </div>
+                                <div class="absolute inset-0 rounded-full border border-white/10 m-2"></div><div class="absolute inset-0 rounded-full border border-white/10 m-6"></div>
+                            </div>
+                            
+                            <!-- Cover Sleeve -->
+                            <div class="absolute inset-0 bg-white shadow-2xl rounded-sm border border-white overflow-hidden z-10 p-4 flex flex-col justify-between">
+                                <!-- Sleeve Brand Logo -->
+                                <img src="logo.jpg" alt="Logo" class="absolute top-4 right-4 w-6 h-6 rounded-full shadow-sm object-cover opacity-80 z-20 rtl:right-auto rtl:left-4">
+                                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                                
+                                <div class="relative z-10 pr-6 rtl:pr-0 rtl:pl-6">
+                                    <p class="text-[10px] text-rosewood uppercase font-bold tracking-widest mb-1" id="live-genre">Acoustic Warmth</p>
+                                    <h5 class="heading-text text-xl font-bold text-charcoal leading-tight line-clamp-2" id="live-title">"Untitled Masterpiece"</h5>
+                                </div>
+                                <div class="relative z-10 flex justify-between items-end border-t border-rosewood/10 pt-2">
+                                    <div class="flex flex-col"><span class="text-[8px] text-rosewood uppercase" data-i18n="preview_for">Created For</span><span class="text-xs font-bold text-oxblood" id="live-recipient">Someone Special</span></div>
+                                    <span class="text-[9px] font-bold text-charcoal bg-rosewood/10 px-2 py-0.5 rounded" id="live-lang">Lebanese Arabic</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel rounded-3xl p-6 shadow-xl border border-white/60">
+                        <h4 class="font-bold text-charcoal text-lg border-b border-rosewood/10 pb-3 mb-4" data-i18n="receipt_title">Order Summary</h4>
+                        <div class="flex flex-col gap-2 text-sm mb-4" id="receipt-items"></div>
+                        <div class="border-t border-rosewood/10 pt-4 flex justify-between items-end">
+                            <span class="font-bold text-charcoal" data-i18n="receipt_total">Total Estimated</span>
+                            <span class="text-3xl font-black text-oxblood" id="live-total">$34</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART D: REVIEWS SECTION -->
+        <section id="reviews" class="py-20 px-6 relative z-10">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-12">
+                    <div class="glass-panel inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold text-oxblood mb-4 shadow-sm">
+                        <span data-i18n="rev_badge">4.9/5 ★ (120+ Original Songs Delivered)</span>
+                    </div>
+                    <h2 class="heading-text text-4xl md:text-5xl font-bold text-charcoal mb-4" data-i18n="rev_header">Loved Across Lebanon</h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col justify-between shadow-lg border border-white/50">
+                        <div>
+                            <div class="flex text-oxblood mb-4"><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i></div>
+                            <p class="text-charcoal font-medium italic text-sm leading-relaxed mb-6" data-i18n="rev_1_text">"Everyone at our wedding cried when our story started playing during the first dance. The cinema video montage was worth every dollar!"</p>
+                        </div>
+                        <div class="border-t border-oxblood/10 pt-4"><h5 class="font-bold text-charcoal text-sm" data-i18n="rev_1_name">Nour & Jad - Batroun Wedding</h5></div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col justify-between shadow-lg border border-white/50 relative transform md:-translate-y-4">
+                        <div>
+                            <div class="flex text-oxblood mb-4"><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i></div>
+                            <p class="text-charcoal font-medium italic text-sm leading-relaxed mb-6" data-i18n="rev_2_text">"Sent a 1-minute voice note on WhatsApp with old family memories, and 48 hours later I received a Fairouz-style Tarab masterpiece. Mom plays it every morning."</p>
+                        </div>
+                        <div class="border-t border-oxblood/10 pt-4"><h5 class="font-bold text-charcoal text-sm" data-i18n="rev_2_name">Rami K. - Mother's Birthday, Beirut</h5></div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col justify-between shadow-lg border border-white/50">
+                        <div>
+                            <div class="flex text-oxblood mb-4"><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i><i data-lucide="star" class="w-4 h-4 fill-oxblood"></i></div>
+                            <p class="text-charcoal font-medium italic text-sm leading-relaxed mb-6" data-i18n="rev_3_text">"Being able to read and approve the lyrics before they recorded gave me total peace of mind. Best $34 gift I've ever given."</p>
+                        </div>
+                        <div class="border-t border-oxblood/10 pt-4"><h5 class="font-bold text-charcoal text-sm" data-i18n="rev_3_name">Maya S. - Anniversary Gift, Zahle</h5></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART E: GIFT UNWRAP BANNER -->
+        <section id="gift-unwrap-banner" class="px-6 mb-20 relative z-10">
+            <div class="max-w-4xl mx-auto glass-panel rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-oxblood/20 bg-gradient-to-r from-white/60 to-oxblood/5">
+                <div class="flex items-center gap-4 text-start">
+                    <div class="w-12 h-12 rounded-full bg-oxblood text-white flex items-center justify-center shrink-0 shadow-lg"><i data-lucide="gift" class="w-6 h-6"></i></div>
+                    <p class="font-bold text-charcoal leading-tight max-w-sm" data-i18n="gift_banner_text">🎁 Exclusive Hkayetna Feature: Every song comes with a Digital Gift Unwrap Screen for your loved one.</p>
+                </div>
+                <button onclick="openGiftModal()" class="bg-oxblood text-white px-6 py-3 rounded-full text-sm font-semibold spring-press shrink-0 hover:bg-oxblood-light transition-colors shadow-lg" data-i18n="gift_banner_btn">Preview Gift Unwrap ✨</button>
+            </div>
+        </section>
+
+        <!-- PART F: FAQ ACCORDION -->
+        <section id="faq-section" class="py-20 px-6 relative z-10">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="heading-text text-3xl font-bold text-center text-charcoal mb-10" data-i18n="faq_title">Frequently Asked Questions</h2>
+                <div class="flex flex-col gap-4">
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-white/50">
+                        <button onclick="toggleFAQ(this)" class="w-full flex items-center justify-between p-5 text-start hover:bg-white/40 transition-colors spring-press">
+                            <span class="font-bold text-charcoal text-sm" data-i18n="faq_q1">How does the lyric approval work?</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 text-oxblood faq-icon transition-transform"></i>
+                        </button>
+                        <div class="faq-answer bg-white/30"><div class="p-5 pt-0 text-sm text-rosewood" data-i18n="faq_a1">We write your lyrics based on your story and send them to you on WhatsApp. You can review them, request tweaks, and give your final approval before we record a single note.</div></div>
+                    </div>
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-white/50">
+                        <button onclick="toggleFAQ(this)" class="w-full flex items-center justify-between p-5 text-start hover:bg-white/40 transition-colors spring-press">
+                            <span class="font-bold text-charcoal text-sm" data-i18n="faq_q2">How do I pay in Lebanon?</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 text-oxblood faq-icon transition-transform"></i>
+                        </button>
+                        <div class="faq-answer bg-white/30"><div class="p-5 pt-0 text-sm text-rosewood" data-i18n="faq_a2">Zero online card needed. After you submit your order, we confirm everything with you on WhatsApp. You can then pay securely via Whish Money, OMT, or NEO Cash transfer.</div></div>
+                    </div>
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-white/50">
+                        <button onclick="toggleFAQ(this)" class="w-full flex items-center justify-between p-5 text-start hover:bg-white/40 transition-colors spring-press">
+                            <span class="font-bold text-charcoal text-sm" data-i18n="faq_q3">How fast will I receive my song?</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 text-oxblood faq-icon transition-transform"></i>
+                        </button>
+                        <div class="faq-answer bg-white/30"><div class="p-5 pt-0 text-sm text-rosewood" data-i18n="faq_a3">Standard delivery takes 3–4 days. If you need it sooner, you can choose Express (48 hours) or VIP Rush (24 hours) during checkout.</div></div>
+                    </div>
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-white/50">
+                        <button onclick="toggleFAQ(this)" class="w-full flex items-center justify-between p-5 text-start hover:bg-white/40 transition-colors spring-press">
+                            <span class="font-bold text-charcoal text-sm" data-i18n="faq_q4">Can I explain my story by voice instead of typing?</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 text-oxblood faq-icon transition-transform"></i>
+                        </button>
+                        <div class="faq-answer bg-white/30"><div class="p-5 pt-0 text-sm text-rosewood" data-i18n="faq_a4">Yes! Just select the 'Voice Note' tab in Stage 3. When you submit your order, it will open WhatsApp, and you can comfortably record a voice note explaining your memories.</div></div>
+                    </div>
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-white/50">
+                        <button onclick="toggleFAQ(this)" class="w-full flex items-center justify-between p-5 text-start hover:bg-white/40 transition-colors spring-press">
+                            <span class="font-bold text-charcoal text-sm" data-i18n="faq_q5">Can you mix Arabic, English, and French in the same song?</span>
+                            <i data-lucide="chevron-down" class="w-5 h-5 text-oxblood faq-icon transition-transform"></i>
+                        </button>
+                        <div class="faq-answer bg-white/30"><div class="p-5 pt-0 text-sm text-rosewood" data-i18n="faq_a5">Yes, we love crafting natural Lebanese Franco and bilingual flows! Just select the 'Bilingual Mix' option in Stage 2.</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART G: LUXURY FOOTER -->
+        <footer id="footer-section" class="bg-charcoal text-white py-16 px-6 relative z-10 overflow-hidden">
+            <div class="absolute inset-0 bg-oxblood/10 blur-3xl rounded-full translate-y-1/2 opacity-30"></div>
+            <div class="max-w-7xl mx-auto relative z-10">
+                <div class="grid md:grid-cols-3 gap-10 border-b border-white/10 pb-12">
+                    <!-- Brand -->
+                    <div class="flex flex-col gap-4 items-start">
+                        <div class="flex items-center gap-3">
+                            <div class="relative w-8 h-8 flex items-center justify-center rounded-full bg-white overflow-hidden border border-oxblood/30">
+                                <img src="logo.jpg" alt="Logo" class="w-full h-full object-cover">
+                            </div>
+                            <span class="heading-text text-xl font-bold text-white tracking-tight">Hkayetna</span>
+                        </div>
+                        <p class="text-xs text-white/60 max-w-xs leading-relaxed" data-i18n="ft_desc">Lebanon's premier bespoke personalized song studio. Transforming your memories into permanent, studio-grade soundtracks.</p>
+                    </div>
+                    <!-- Links -->
+                    <div class="flex flex-col gap-3">
+                        <h4 class="font-bold text-sm mb-2" data-i18n="ft_links">Quick Links</h4>
+                        <a href="#vault-section" class="text-sm text-white/60 hover:text-white transition-colors w-fit" data-i18n="nav_vault">The Vault</a>
+                        <a href="#how-it-works" class="text-sm text-white/60 hover:text-white transition-colors w-fit" data-i18n="nav_how">How It Works</a>
+                        <a href="#faq-section" class="text-sm text-white/60 hover:text-white transition-colors w-fit" data-i18n="faq_title">FAQ</a>
+                        <button onclick="openTermsModal()" class="text-sm text-white/60 hover:text-white transition-colors w-fit text-start" data-i18n="ft_tc">Terms & Conditions</button>
+                    </div>
+                    <!-- Contact -->
+                    <div class="flex flex-col gap-3">
+                        <h4 class="font-bold text-sm mb-2" data-i18n="ft_contact">Get in Touch</h4>
+                        <a href="https://wa.me/96171817340" target="_blank" class="glass-panel-dark px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 hover:bg-white/10 transition-colors w-fit"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp Support</a>
+                        <a href="mailto:ba662569@gmail.com" class="text-sm text-white/60 hover:text-white transition-colors w-fit flex items-center gap-2 mt-2"><i data-lucide="mail" class="w-4 h-4"></i> ba662569@gmail.com</a>
+                    </div>
+                </div>
+                <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/40">
+                    <span data-i18n="ft_copy">© 2026 Hkayetna • Crafted with Passion in Lebanon. Your Story, In a Song.</span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- MODALS & FLOATING BUTTONS (Attached outside #app-content) -->
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/96171817340" target="_blank" class="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-green-500 text-white shadow-[0_10px_30px_rgba(34,197,94,0.3)] flex items-center justify-center z-[90] hover:scale-110 transition-transform animate-bounce hover:animate-none rtl:right-auto rtl:left-6">
+        <i data-lucide="message-circle" class="w-7 h-7"></i>
+    </a>
+
+    <!-- Digital Gift Unwrap Modal -->
+    <div id="gift-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md hidden items-center justify-center transition-opacity duration-500 opacity-0 overflow-hidden">
+        <button onclick="closeGiftModal()" class="absolute top-6 right-6 text-white/70 hover:text-white z-20 rtl:right-auto rtl:left-6"><i data-lucide="x" class="w-8 h-8"></i></button>
+        <div class="relative w-full max-w-lg flex flex-col items-center justify-center p-6">
+            
+            <div id="gift-box" class="flex flex-col items-center text-center cursor-pointer hover-shake" onclick="triggerUnwrap()">
+                <div class="text-8xl mb-6 filter drop-shadow-2xl">🎁</div>
+                <h3 class="heading-text text-3xl font-bold text-white mb-2" data-i18n="mdl_gift_title">Tap to Unwrap</h3>
+                <p class="text-white/70 text-sm" data-i18n="mdl_gift_sub">A personalized masterpiece awaits.</p>
+            </div>
+
+            <div id="gift-vinyl" class="hidden flex-col items-center text-center relative z-10 w-full animate-[wiggle_1s_ease-in-out]">
+                <h3 class="heading-text text-2xl font-bold text-white mb-8" data-i18n="mdl_gift_success">A Soundtrack Created Just For You!</h3>
+                <div class="relative w-64 h-64 mx-auto">
+                    <div class="absolute inset-0 rounded-full bg-[#111] shadow-[0_0_50px_rgba(255,215,0,0.3)] flex items-center justify-center vinyl-record border-4 border-[#222]">
+                        <!-- Gift Modal Brand Logo inside vinyl -->
+                        <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-inner overflow-hidden border border-[#222] relative z-10">
+                            <img src="logo.jpg" alt="Label" class="w-full h-full object-cover">
+                            <div class="absolute w-3 h-3 bg-white rounded-full shadow-sm"></div>
+                        </div>
+                        <div class="absolute inset-0 rounded-full border border-white/10 m-2"></div><div class="absolute inset-0 rounded-full border border-white/10 m-6"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div id="terms-modal" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="glass-panel w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-3xl p-8 relative shadow-2xl">
+            <button onclick="closeTermsModal()" class="absolute top-6 right-6 text-charcoal/50 hover:text-charcoal z-20 rtl:right-auto rtl:left-6"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h3 class="heading-text text-2xl font-bold text-charcoal mb-6" data-i18n="tc_title">Terms & Conditions</h3>
+            <div class="flex flex-col gap-4 text-sm text-rosewood leading-relaxed" id="tc-content" dir="auto">
+                <p><strong class="text-charcoal" data-i18n="tc_h1">1. Lyric Approval & Revisions:</strong> <span data-i18n="tc_p1">We provide the lyrics for your approval prior to recording. You are entitled to one (1) free revision phase for the lyrics. Once approved and recorded, any changes will incur a re-recording fee.</span></p>
+                <p><strong class="text-charcoal" data-i18n="tc_h2">2. Payment Policy:</strong> <span data-i18n="tc_p2">No payment is required immediately upon submitting the form. We will contact you via WhatsApp to finalize details, after which payment must be settled via Whish, OMT, or Cash before studio production begins.</span></p>
+                <p><strong class="text-charcoal" data-i18n="tc_h3">3. Delivery Times:</strong> <span data-i18n="tc_p3">Delivery times (Standard, Express, VIP) begin calculating from the moment payment is confirmed and lyrics are approved.</span></p>
+                <p><strong class="text-charcoal" data-i18n="tc_h4">4. Privacy & Ownership:</strong> <span data-i18n="tc_p4">Your story and audio remain fully private unless you explicitly grant us permission to feature it in "The Vault". You receive personal usage rights to the final song (non-commercial, unless the Brand Anthem package is purchased).</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+        const WHATSAPP_NUMBER = "96171817340"; 
+
+        // -------------------------------------------------------------------
+        // FULL DICTIONARY (EN / AR)
+        // -------------------------------------------------------------------
+        const dict = {
+            en: {
+                tagline: "YOUR STORY, IN A SONG.", nav_vault: "The Vault", nav_how: "How It Works", nav_studio: "Song Studio", nav_reviews: "Reviews", nav_cta: "Create Your Song",
+                hero_badge: "BESPOKE AUDIO HOUSE • CRAFTED IN LEBANON", hero_headline_1: "YOUR STORY.", hero_headline_2: "YOUR PERMANENT SOUNDTRACK.", hero_sub: "Transform your personal memories, inside jokes, and milestones into a studio-grade original song. Real emotion, premium composition, starting at just $19.",
+                hero_cta_primary: "Build Your Soundtrack — From $19", hero_cta_secondary: "Listen to the Vault", trust_1: "Studio-Grade Vocals", trust_2: "48h–72h Fast Delivery", trust_3: "Direct WhatsApp Delivery",
+                hero_song_title: "\"Forever in Batroun\"", hero_song_tag: "Acoustic Indie • English", gift_title: "Not sure where to start?", gift_sub: "Pick the recipient & vibe, we'll guide you.",
+                gift_who_placeholder: "Who is it for?", gift_who_love: "Partner / Love", gift_who_bday: "Birthday (Friends)", gift_who_family: "Mother / Family", gift_who_wedding: "Wedding Couple",
+                gift_vibe_placeholder: "What's the vibe?", gift_vibe_acoustic: "Acoustic / Emotional", gift_vibe_pop: "Upbeat Pop / Dance", gift_vibe_tarab: "Tarab / Classic Lebanese", gift_vibe_cinematic: "Cinematic / Grand", gift_btn: "Configure Now",
+                vault_title: "The Vault", vault_sub: "Listen to how we turn messy, beautiful human memories into professionally produced music.", filter_all: "All", filter_love: "Love & Weddings", filter_tarab: "Tarab & Lebanese", filter_family: "Family & Mom", vault_before: "Client Note",
+                vault_c1_prompt: "\"Mention our late-night coffee drives to Batroun...\"", vault_c1_title: "The Grey Hoodie", vault_c1_tag: "Acoustic Pop • English",
+                vault_c2_prompt: "\"My dad is retiring after 40 years. He loves old Fairouz songs...\"", vault_c2_title: "Tawlet Zahr", vault_c2_tag: "Classic Tarab • Arabic",
+                vault_c3_prompt: "\"For our newborn daughter, Yara. Include the feeling of holding her small hands...\"", vault_c3_title: "Yara's Shield", vault_c3_tag: "Lullaby Strings • Bilingual",
+                vault_c4_prompt: "\"My sister is graduating med school at AUB. Make it an upbeat pop anthem...\"", vault_c4_title: "Surgeon's Anthem", vault_c4_tag: "Upbeat Pop • English",
+                hw_title: "How It Works", hw_sub: "Four simple steps to your permanent soundtrack.", hw_s1_title: "Configure Sound", hw_s1_desc: "Pick your canvas ($19 or $34), vibe, and vocal style.", hw_s2_title: "Share Memories", hw_s2_desc: "Type key moments or send a quick WhatsApp voice note.", hw_s3_title: "Approve Lyrics", hw_s3_desc: "We write and send custom lyrics for approval before recording.", hw_s4_title: "Unwrap Masterpiece", hw_s4_desc: "Receive your studio-grade song in 48h–72h via WhatsApp.",
+                wz_nav_1: "1. Canvas", wz_nav_2: "2. Sound", wz_nav_3: "3. Story", wz_nav_4: "4. Upgrades", wz_nav_5: "5. Review", stg1_title: "1. Base Canvas & Occasion", badge_popular: "MOST POPULAR", badge_best: "BEST GIFT",
+                stg1_canvas1_title: "The Spark ($19)", stg1_canvas1_desc: "1.5-Min Custom Song • Core memories • Studio MP3", stg1_canvas2_title: "The Full Soundtrack ($34)", stg1_canvas2_desc: "3-Min Complete Song • Verses, Chorus, Bridge • Deep story", stg1_canvas3_title: "Brand Anthem ($55)", stg1_canvas3_desc: "Sonic identity, jingle, or promo audio for business",
+                stg1_occ_title: "Who is this for?", occ_love: "Partner / Love", occ_wedding: "Wedding", occ_bday: "Birthday", occ_parents: "Mother/Father", occ_grad: "Graduation", occ_friend: "Friend", occ_baby: "Newborn", occ_brand: "Business",
+                stg1_rec_label: "Recipient's Name", stg1_rec_placeholder: "e.g., Sarah, Mom, Rami & Nour", stg1_title_label: "Custom Song Title (Optional)", stg1_title_placeholder: "We can also name it for you!",
+                stg2_title: "2. Sound & Vibe", stg2_lang: "Language", lang_ar: "Lebanese Arabic", lang_en: "English", lang_fr: "French", lang_mix: "Bilingual / Franco", stg2_vocal: "Vocal Style", voc_m: "Male (Free)", voc_f: "Female (Free)", voc_d: "Duet",
+                stg2_genre: "Musical Genre", gen_ac: "Acoustic Warmth", gen_tar: "Lebanese Tarab", gen_pop: "Upbeat Pop", gen_cin: "Cinematic Strings", gen_ind: "Indie / Chill", stg2_sliders: "Emotion & Energy", sl_mood_1: "Tears 🥺", sl_mood_2: "Balanced ✨", sl_mood_3: "Hype 🔥", sl_temp_1: "Slow 🕯️", sl_temp_2: "Groove 🎶", sl_temp_3: "Fast 💃",
+                stg3_title: "3. Your Story", stg3_tab_text: "Type Details", stg3_tab_voice: "Voice Note", spark_1: "+ Where did you meet?", spark_2: "+ Inside joke?", spark_3: "+ Funny habit?",
+                spark_1_prompt: "Where did you first meet? ", spark_2_prompt: "What is the funniest inside joke? ", spark_3_prompt: "What is a habit they always do? ",
+                stg3_story_ph: "Tell us everything...", stg3_vn_title: "Send a Voice Note", stg3_vn_desc: "Skip typing! At checkout, we'll open WhatsApp so you can comfortably record your memories via voice.", stg3_tags_title: "Must-Mention Words (Nicknames, Places, Dates)", stg3_tags_ph: "e.g., Batroun, May 14...", stg3_ded_title: "🎁 Free Voice Dedication", stg3_ded_desc: "Add your own 5-sec voice memo at the very start.",
+                stg4_title: "4. Enhancements & Speed", stg4_upg_title: "Visual Add-Ons", upg_1_name: "Lyric Poster", upg_1_title: "Vinyl & Frame Printable Poster", upg_1_desc: "High-res lyric sheet with scannable QR.", upg_2_name: "Cover Art", upg_2_title: "Bespoke Album Cover Art", upg_2_desc: "Custom Spotify-style art from your photo.", upg_3_name: "Cinema Montage", upg_3_title: "Cinema Memories Video Montage", upg_3_desc: "Pro Reel/TikTok edit syncing photos & lyrics.",
+                stg4_speed_title: "Delivery Speed", spd_1: "Standard (3–4 Days)", spd_2: "Express (48 Hours)", spd_3: "VIP Rush (24 Hours)", spd_free: "FREE",
+                stg5_title: "5. Final Details", stg5_name: "Your Name", stg5_name_ph: "John Doe", stg5_wa: "WhatsApp Number", stg5_pay_title: "Preferred Payment (Lebanon)", stg5_trust: "Zero upfront charge. Submit your request below, and we'll confirm your story on WhatsApp before any payment.",
+                btn_back: "← Back", btn_next: "Next Step →", btn_wa: "Send Order to WhatsApp", btn_email: "Or send via Email", preview_title: "Live Studio Preview", preview_for: "Created For", receipt_title: "Order Summary", receipt_total: "Total Estimated", receipt_base: "Base Canvas", receipt_lang: "Bilingual Mix", receipt_voc: "Duet Vocals", receipt_upg: "Upgrades", receipt_spd: "Speed Upgrade",
+                rev_badge: "4.9/5 ★ (120+ Original Songs Delivered)", rev_header: "Loved Across Lebanon", rev_1_name: "Nour & Jad - Batroun Wedding", rev_1_text: "\"Everyone at our wedding cried when our story started playing during the first dance. The cinema video montage was worth every dollar!\"", rev_2_name: "Rami K. - Mother's Birthday, Beirut", rev_2_text: "\"Sent a 1-minute voice note on WhatsApp with old family memories, and 48 hours later I received a Fairouz-style Tarab masterpiece. Mom plays it every morning.\"", rev_3_name: "Maya S. - Anniversary Gift, Zahle", rev_3_text: "\"Being able to read and approve the lyrics before they recorded gave me total peace of mind. Best $34 gift I've ever given.\"",
+                gift_banner_text: "🎁 Exclusive Hkayetna Feature: Every song comes with a Digital Gift Unwrap Screen for your loved one.", gift_banner_btn: "Preview Gift Unwrap ✨", mdl_gift_title: "Tap to Unwrap", mdl_gift_sub: "A personalized masterpiece awaits.", mdl_gift_success: "A Soundtrack Created Just For You!",
+                faq_title: "Frequently Asked Questions", faq_q1: "How does the lyric approval work?", faq_a1: "We write your lyrics based on your story and send them to you on WhatsApp. You can review them, request tweaks, and give your final approval before we record a single note.", faq_q2: "How do I pay in Lebanon?", faq_a2: "Zero online card needed. After you submit your order, we confirm everything with you on WhatsApp. You can then pay securely via Whish Money, OMT, or NEO Cash transfer.", faq_q3: "How fast will I receive my song?", faq_a3: "Standard delivery takes 3–4 days. If you need it sooner, you can choose Express (48 hours) or VIP Rush (24 hours) during checkout.", faq_q4: "Can I explain my story by voice instead of typing?", faq_a4: "Yes! Just select the 'Voice Note' tab in Stage 3. When you submit your order, it will open WhatsApp, and you can comfortably record a voice note explaining your memories.", faq_q5: "Can you mix Arabic, English, and French in the same song?", faq_a5: "Yes, we love crafting natural Lebanese Franco and bilingual flows! Just select the 'Bilingual Mix' option in Stage 2.",
+                ft_desc: "Lebanon's premier bespoke personalized song studio. Transforming your memories into permanent, studio-grade soundtracks.", ft_links: "Quick Links", ft_tc: "Terms & Conditions", ft_contact: "Get in Touch", ft_copy: "© 2026 Hkayetna • Crafted with Passion in Lebanon. Your Story, In a Song.",
+                tc_title: "Terms & Conditions", tc_h1: "1. Lyric Approval & Revisions:", tc_p1: "We provide the lyrics for your approval prior to recording. You are entitled to one (1) free revision phase for the lyrics. Once approved and recorded, any changes will incur a re-recording fee.", tc_h2: "2. Payment Policy:", tc_p2: "No payment is required immediately upon submitting the form. We will contact you via WhatsApp to finalize details, after which payment must be settled via Whish, OMT, or Cash before studio production begins.", tc_h3: "3. Delivery Times:", tc_p3: "Delivery times (Standard, Express, VIP) begin calculating from the moment payment is confirmed and lyrics are approved.", tc_h4: "4. Privacy & Ownership:", tc_p4: "Your story and audio remain fully private unless you explicitly grant us permission to feature it in \"The Vault\". You receive personal usage rights to the final song (non-commercial, unless the Brand Anthem package is purchased)."
+            },
+            ar: {
+                tagline: "قصتك، في أغنية.", nav_vault: "الخزنة", nav_how: "كيف نعمل", nav_studio: "الاستوديو", nav_reviews: "الآراء", nav_cta: "اصنع أغنيتك",
+                hero_badge: "دار صوتيات مخصصة • صُنع بحب في لبنان", hero_headline_1: "قصتك.", hero_headline_2: "موسيقاك الخالدة.", hero_sub: "حوّل ذكرياتك ومناسباتك الخاصة إلى أغنية بجودة استوديو احترافية. تبدأ من 19$ فقط.",
+                hero_cta_primary: "اصنع موسيقاك — من 19$", hero_cta_secondary: "استمع إلى العينات", trust_1: "غناء استوديو احترافي", trust_2: "تسليم سريع 48-72 ساعة", trust_3: "توصيل مباشر عبر واتساب",
+                hero_song_title: "\"دائماً في البترون\"", hero_song_tag: "أكوستيك إندي • إنجليزي", gift_title: "محتار من وين تبدأ؟", gift_sub: "اختار لمين الأغنية، ونحنا منرشدك.",
+                gift_who_placeholder: "لمين الأغنية؟", gift_who_love: "شريك / حب", gift_who_bday: "عيد ميلاد (أصدقاء)", gift_who_family: "أم / عائلة", gift_who_wedding: "عرسان",
+                gift_vibe_placeholder: "شو الجو العام؟", gift_vibe_acoustic: "هادئ / عاطفي", gift_vibe_pop: "بوب حماسي", gift_vibe_tarab: "طرب كلاسيكي", gift_vibe_cinematic: "سينمائي فخم", gift_btn: "ابدأ التخصيص",
+                vault_title: "الخزنة", vault_sub: "استمع كيف نحول الذكريات إلى موسيقى منتجة باحتراف.", filter_all: "الكل", filter_love: "حب وأعراس", filter_tarab: "طرب ولبناني", filter_family: "عائلة وأم", vault_before: "ملاحظة العميل",
+                vault_c1_prompt: "\"اذكر مشاويرنا بنص الليل عالبترون...\"", vault_c1_title: "الكنزة الرمادية", vault_c1_tag: "بوب أكوستيك • إنجليزي",
+                vault_c2_prompt: "\"بيي تقاعد بعد 40 سنة. بيحب أغاني فيروز...\"", vault_c2_title: "طاولة زهر", vault_c2_tag: "طرب كلاسيكي • عربي",
+                vault_c3_prompt: "\"لبنتنا المولودة جديد يارا. ضيف إحساس مسكة إيديها...\"", vault_c3_title: "سند يارا", vault_c3_tag: "وتريات هادئة • لغتين",
+                vault_c4_prompt: "\"أختي رح تتخرج من الطب بالـ AUB. بدي ياها حماسية...\"", vault_c4_title: "نشيد الجرّاحة", vault_c4_tag: "بوب حماسي • إنجليزي",
+                hw_title: "كيف نعمل", hw_sub: "أربع خطوات بسيطة لموسيقاك الخاصة.", hw_s1_title: "اختر الصوت", hw_s1_desc: "حدد حجم الأغنية (19$ أو 34$) والجو العام.", hw_s2_title: "شارك الذكريات", hw_s2_desc: "اكتب التفاصيل أو ابعت رسالة صوتية.", hw_s3_title: "وافق عالكلمات", hw_s3_desc: "نكتب ونرسل الكلمات للموافقة قبل التسجيل.", hw_s4_title: "استلم أغنيتك", hw_s4_desc: "تستلم أغنيتك الاحترافية خلال 48-72 ساعة.",
+                wz_nav_1: "1. الأساس", wz_nav_2: "2. الصوت", wz_nav_3: "3. القصة", wz_nav_4: "4. إضافات", wz_nav_5: "5. مراجعة", stg1_title: "1. حجم الأغنية والمناسبة", badge_popular: "الأكثر طلباً", badge_best: "أفضل هدية",
+                stg1_canvas1_title: "الشرارة (19$)", stg1_canvas1_desc: "1.5 دقيقة • ذكريات أساسية • MP3 استوديو", stg1_canvas2_title: "الأغنية الكاملة (34$)", stg1_canvas2_desc: "3 دقائق كاملة • قصة عميقة وكاملة", stg1_canvas3_title: "هوية تجارية (55$)", stg1_canvas3_desc: "موسيقى ترويجية للشركات والأعمال",
+                stg1_occ_title: "لمين الأغنية؟", occ_love: "شريك / حب", occ_wedding: "زفاف", occ_bday: "عيد ميلاد", occ_parents: "أم/أب", occ_grad: "تخرج", occ_friend: "صديق", occ_baby: "مولود", occ_brand: "عمل",
+                stg1_rec_label: "اسم المهدى إليه", stg1_rec_placeholder: "مثال: سارة، إمي، رامي ونور", stg1_title_label: "اسم الأغنية (اختياري)", stg1_title_placeholder: "فينا نختار اسم حلو إلك!",
+                stg2_title: "2. الصوت والجو العام", stg2_lang: "لغة الأغنية", lang_ar: "عربي لبناني", lang_en: "إنجليزي", lang_fr: "فرنسي", lang_mix: "لغتين / فرانكو", stg2_vocal: "أسلوب الغناء", voc_m: "شاب (مشمول)", voc_f: "صبية (مشمول)", voc_d: "ديو مشترك",
+                stg2_genre: "النوع الموسيقي", gen_ac: "أكوستيك دافئ", gen_tar: "طرب لبناني", gen_pop: "بوب حماسي", gen_cin: "وتريات سينمائية", gen_ind: "إندي رايق", stg2_sliders: "الإحساس والطاقة", sl_mood_1: "مؤثرة 🥺", sl_mood_2: "متوازنة ✨", sl_mood_3: "مرحة 🔥", sl_temp_1: "هادية 🕯️", sl_temp_2: "رواق 🎶", sl_temp_3: "سريعة 💃",
+                stg3_title: "3. قصتك", stg3_tab_text: "اكتب التفاصيل", stg3_tab_voice: "رسالة صوتية", spark_1: "+ وين التقيتو؟", spark_2: "+ نكتة بيناتكن؟", spark_3: "+ عادة بيعملها؟",
+                spark_1_prompt: "وين التقيتو لأول مرة؟ ", spark_2_prompt: "شو أكتر نكتة بتضحكن بيناتكن؟ ", spark_3_prompt: "شو العادة اللي دايماً بيعملها؟ ",
+                stg3_story_ph: "خبرنا كل شي...", stg3_vn_title: "ابعت رسالة صوتية", stg3_vn_desc: "بلا كتابة! بالنهاية رح نفتح واتساب لتبعت التفاصيل بصوتك.", stg3_tags_title: "كلمات لازم نذكرها (ألقاب، أماكن، تواريخ)", stg3_tags_ph: "مثال: البترون، 14 أيار...", stg3_ded_title: "🎁 إهداء صوتي مجاني", stg3_ded_desc: "ضيف 5 ثواني بصوتك بأول الأغنية.",
+                stg4_title: "4. الإضافات والسرعة", stg4_upg_title: "إضافات بصرية (اختياري)", upg_1_name: "بوستر الكلمات", upg_1_title: "بوستر قابل للطباعة", upg_1_desc: "تصميم أنيق لكلمات الأغنية مع QR.", upg_2_name: "غلاف ألبوم", upg_2_title: "غلاف ألبوم مخصص", upg_2_desc: "تصميم كفر سبوتيفاي من صورتك.", upg_3_name: "مونتاج فيديو", upg_3_title: "مونتاج فيديو سينمائي", upg_3_desc: "فيديو تيك توك مع صورك والكلمات.",
+                stg4_speed_title: "سرعة التسليم", spd_1: "عادي (3-4 أيام)", spd_2: "سريع (48 ساعة)", spd_3: "عاجل VIP (24 ساعة)", spd_free: "مجاناً",
+                stg5_title: "5. تفاصيل الطلب", stg5_name: "اسمك", stg5_name_ph: "اسمك الكريم", stg5_wa: "رقم الواتساب", stg5_pay_title: "طريقة الدفع (في لبنان)", stg5_trust: "بدون دفع مسبق أونلاين. أرسل طلبك، ورح نأكد التفاصيل على واتساب قبل أي دفع.",
+                btn_back: "← رجوع", btn_next: "التالي →", btn_wa: "إرسال الطلب عبر واتساب", btn_email: "أو إرسال عبر الإيميل", preview_title: "معاينة الاستوديو", preview_for: "مُهداة إلى", receipt_title: "ملخص الطلب", receipt_total: "الإجمالي", receipt_base: "حجم الأغنية", receipt_lang: "دمج لغات", receipt_voc: "غناء ديو", receipt_upg: "إضافات", receipt_spd: "تسريع التسليم",
+                rev_badge: "4.9/5 ★ (أكثر من 120 أغنية سُلمت)", rev_header: "قصص حقيقية من لبنان", rev_1_name: "نور وجاد - زفاف في البترون", rev_1_text: "\"الكل بكي بعرسنا لما بلشت قصتنا تنلعب بالرقصة الأولى. مونتاج الفيديو السينمائي كان بيسوى كل دولار!\"", rev_2_name: "رامي ك. - عيد ميلاد أمي، بيروت", rev_2_text: "\"بعتت رسالة صوتية دقيقة على واتساب عن ذكريات العيلة القديمة، وبعد 48 ساعة استلمت تحفة طربية بستايل فيروز. إمي بتسمعها كل صبح.\"", rev_3_name: "مايا س. - هدية ذكرى زواج، زحلة", rev_3_text: "\"كوني قدرت اقرأ ووافق عالكلمات قبل التسجيل عطاني راحة بال تامة. أحلى هدية بـ 34$ قدمتها بحياتي.\"",
+                gift_banner_text: "🎁 ميزة حصرية من حكايتنا: كل أغنية بتجي مع شاشة فتح هدية رقمية مخصصة للشخص اللي بتحبه.", gift_banner_btn: "معاينة تجربة الهدية ✨", mdl_gift_title: "اضغط لفتح الهدية", mdl_gift_sub: "تحفة فنية مخصصة ناطرتك.", mdl_gift_success: "موسيقى انعملت خصيصاً إلك!",
+                faq_title: "الأسئلة الشائعة", faq_q1: "كيف بتصير الموافقة عالكلمات؟", faq_a1: "نحن منكتب الكلمات بناءً على قصتك ومنبعتلك ياها على واتساب. فيك تقرأها، تطلب تعديلات، وتعطينا الموافقة النهائية قبل ما نسجل أي نوتة.", faq_q2: "كيف بدفع بلبنان؟", faq_a2: "ما في داعي لبطاقة أونلاين. بعد ما تبعت طلبك، منأكد كل التفاصيل معك على واتساب، وبعدين فيك تدفع بأمان عبر Whish Money أو OMT أو تحويل NEO Cash.", faq_q3: "بأي سرعة بستلم أغنيتي؟", faq_a3: "التسليم العادي بياخد 3-4 أيام. إذا كنت مستعجل، فيك تختار التسليم السريع (48 ساعة) أو العاجل VIP (24 ساعة) وقت الطلب.", faq_q4: "فيني اشرح قصتي بصوتي بدل ما اكتب؟", faq_a4: "أكيد! بس اختار تبويب 'رسالة صوتية' بالمرحلة 3. ولما تبعت طلبك، رح نفتحلك واتساب لتقدر تسجل براحتك رسالة صوتية بتشرح فيها ذكرياتك.", faq_q5: "فيكن تدمجوا عربي وإنجليزي وفرنسي بنفس الأغنية؟", faq_a5: "نعم، نحنا منحب نصنع تدفق لبناني فرانكو ولغتين بشكل طبيعي! بس اختار خيار 'دمج لغات' بالمرحلة 2.",
+                ft_desc: "استوديو لبنان الأول للأغاني المخصصة. نحول ذكرياتك إلى موسيقى دائمة بجودة احترافية.", ft_links: "روابط سريعة", ft_tc: "الشروط والأحكام", ft_contact: "تواصل معنا", ft_copy: "© 2026 حكايتنا • صُنع بشغف في لبنان. قصتك، في أغنية.",
+                tc_title: "الشروط والأحكام", tc_h1: "1. الموافقة عالكلمات والتعديلات:", tc_p1: "منوفرلك الكلمات للموافقة عليها قبل التسجيل. إلك حق بمرحلة مراجعة واحدة مجانية للكلمات. بمجرد الموافقة والتسجيل، أي تغييرات رح تتطلب رسوم تسجيل إضافية.", tc_h2: "2. سياسة الدفع:", tc_p2: "ما في دفع فوري عند تقديم الطلب. رح نتواصل معك على واتساب لتأكيد التفاصيل، وبعدين بيتم الدفع عبر Whish أو OMT أو كاش قبل بدء الإنتاج بالاستوديو.", tc_h3: "3. أوقات التسليم:", tc_p3: "أوقات التسليم (عادي، سريع، VIP) بتبلش تنحسب من لحظة تأكيد الدفع والموافقة عالكلمات.", tc_h4: "4. الخصوصية والملكية:", tc_p4: "قصتك والأغنية بيبقوا خاصين تماماً إلا إذا عطيتنا إذن صريح لعرضها بـ \"الخزنة\". إلك حق الاستخدام الشخصي للأغنية النهائية (غير تجاري، إلا بحال شراء باقة الهوية التجارية)."
+            }
+        };
+
+        let currentLang = 'en';
+        function updateLangUI() {
+            const appContent = document.getElementById('app-content');
+            appContent.style.opacity = 0;
+            setTimeout(() => {
+                document.body.className = `lang-${currentLang} antialiased`;
+                appContent.setAttribute('dir', currentLang === 'en' ? 'ltr' : 'rtl');
+                
+                const btnEn = document.getElementById('btn-en'); const btnAr = document.getElementById('btn-ar');
+                if (currentLang === 'en') { btnEn.classList.add('bg-white', 'shadow', 'text-oxblood'); btnAr.classList.remove('bg-white', 'shadow', 'text-oxblood'); } 
+                else { btnAr.classList.add('bg-white', 'shadow', 'text-oxblood'); btnEn.classList.remove('bg-white', 'shadow', 'text-oxblood'); }
+
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (dict[currentLang][key]) {
+                        if (el.tagName === 'OPTION') el.textContent = dict[currentLang][key];
+                        else if (el.innerHTML.includes('<br>')) el.innerHTML = dict[currentLang][key].replace('\n', '<br>');
+                        else el.textContent = dict[currentLang][key];
+                    }
+                });
+                document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    if (dict[currentLang][key]) el.placeholder = dict[currentLang][key];
+                });
+                document.querySelectorAll('[data-i18n-val]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-val');
+                    if (dict[currentLang][key]) el.value = dict[currentLang][key];
+                });
+                appContent.style.opacity = 1;
+                processStateChange();
+                document.getElementById('tc-content').setAttribute('dir', currentLang === 'en' ? 'ltr' : 'rtl');
+            }, 300);
+        }
+        document.getElementById('lang-toggle').addEventListener('click', () => { currentLang = currentLang === 'en' ? 'ar' : 'en'; updateLangUI(); });
+        updateLangUI();
+
+        // -------------------------------------------------------------------
+        // UI INTERACTIONS & MODALS
+        // -------------------------------------------------------------------
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.currentTarget;
+                document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active-filter', 'bg-oxblood', 'text-white'); b.classList.add('text-charcoal'); });
+                target.classList.add('active-filter', 'bg-oxblood', 'text-white'); target.classList.remove('text-charcoal');
+                const filter = target.getAttribute('data-filter');
+                document.querySelectorAll('.vault-card').forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-category') === filter) card.classList.remove('hidden-item');
+                    else card.classList.add('hidden-item');
+                });
+            });
+        });
+
+        function handleGiftFinder() {
+            const who = document.getElementById('gift-who').value; const vibe = document.getElementById('gift-vibe').value;
+            if (who) { const map = { 'love':'Partner/Love', 'birthday':'Birthday', 'family':'Mother/Father', 'wedding':'Wedding' }; const target = document.querySelector(`input[name="occasion"][value="${map[who]}"]`); if(target) target.checked = true; }
+            if (vibe) { const map = { 'acoustic':'Acoustic Warmth', 'pop':'Upbeat Pop', 'tarab':'Lebanese Tarab', 'cinematic':'Cinematic Strings' }; const target = document.querySelector(`input[name="genre"][value="${map[vibe]}"]`); if(target) target.checked = true; }
+            document.getElementById('studio-section').scrollIntoView({ behavior: 'smooth' });
+            processStateChange();
+        }
+
+        function toggleFAQ(btn) {
+            const content = btn.nextElementSibling; const icon = btn.querySelector('.faq-icon'); const isOpen = content.style.maxHeight;
+            document.querySelectorAll('.faq-answer').forEach(el => el.style.maxHeight = null);
+            document.querySelectorAll('.faq-icon').forEach(el => el.style.transform = 'rotate(0deg)');
+            if (!isOpen) { content.style.maxHeight = content.scrollHeight + "px"; icon.style.transform = 'rotate(180deg)'; }
+        }
+
+        function openGiftModal() {
+            const modal = document.getElementById('gift-modal'); modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            document.getElementById('gift-box').classList.remove('hidden'); document.getElementById('gift-vinyl').classList.add('hidden');
+        }
+        function closeGiftModal() { const modal = document.getElementById('gift-modal'); modal.classList.add('opacity-0'); setTimeout(() => modal.classList.add('hidden'), 500); }
+        function triggerUnwrap() { document.getElementById('gift-box').classList.add('hidden'); document.getElementById('gift-vinyl').classList.remove('hidden'); createConfetti(); }
+        function createConfetti() {
+            const container = document.getElementById('gift-modal'); const colors = ['#4A0404', '#7A1212', '#FFFFFF', '#FFD700'];
+            for(let i=0; i<60; i++) {
+                const conf = document.createElement('div'); conf.className = 'absolute w-2 h-2 rounded-sm z-[150]'; conf.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                conf.style.left = '50%'; conf.style.top = '50%'; const angle = Math.random() * Math.PI * 2; const velocity = 50 + Math.random() * 200;
+                conf.style.transition = 'all 1s cubic-bezier(0.25, 1, 0.5, 1)'; container.appendChild(conf);
+                setTimeout(() => { conf.style.transform = `translate(${Math.cos(angle)*velocity}px, ${Math.sin(angle)*velocity}px) rotate(${Math.random()*360}deg)`; conf.style.opacity = '0'; }, 10);
+                setTimeout(() => conf.remove(), 1000);
+            }
+        }
+        function openTermsModal() { const modal = document.getElementById('terms-modal'); modal.classList.remove('hidden'); modal.classList.add('flex'); setTimeout(() => modal.classList.remove('opacity-0'), 10); }
+        function closeTermsModal() { const modal = document.getElementById('terms-modal'); modal.classList.add('opacity-0'); setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300); }
+
+        // -------------------------------------------------------------------
+        // STUDIO WIZARD LOGIC
+        // -------------------------------------------------------------------
+        let currentStage = 1; let tagsList = []; let storyMode = 'text';
+
+        function goToStage(n) {
+            document.querySelectorAll('.wizard-stage').forEach(el => el.classList.remove('active')); document.getElementById(`stage-${n}`).classList.add('active'); currentStage = n;
+            document.querySelectorAll('.wz-nav-btn').forEach((btn, idx) => {
+                if(idx + 1 === n) { btn.classList.add('bg-oxblood', 'text-white'); btn.classList.remove('text-rosewood'); } 
+                else { btn.classList.remove('bg-oxblood', 'text-white'); btn.classList.add('text-rosewood'); }
+            });
+        }
+        function toggleStoryMode(mode) {
+            storyMode = mode;
+            if(mode === 'text') {
+                document.getElementById('tab-text').classList.replace('text-rosewood', 'text-oxblood'); document.getElementById('tab-text').classList.add('bg-white', 'shadow');
+                document.getElementById('tab-voice').classList.remove('bg-white', 'shadow', 'text-oxblood'); document.getElementById('tab-voice').classList.add('text-rosewood');
+                document.getElementById('story-text-area').classList.remove('hidden'); document.getElementById('story-voice-area').classList.add('hidden');
+            } else {
+                document.getElementById('tab-voice').classList.replace('text-rosewood', 'text-oxblood'); document.getElementById('tab-voice').classList.add('bg-white', 'shadow');
+                document.getElementById('tab-text').classList.remove('bg-white', 'shadow', 'text-oxblood'); document.getElementById('tab-text').classList.add('text-rosewood');
+                document.getElementById('story-voice-area').classList.remove('hidden'); document.getElementById('story-text-area').classList.add('hidden');
+            }
+        }
+        function addSpark(key) { const ta = document.getElementById('storyInput'); const translatedText = dict[currentLang][key]; ta.value += (ta.value ? "\n" : "") + translatedText; ta.focus(); }
+        function addTag() { const input = document.getElementById('tagInput'); const val = input.value.trim(); if (val && !tagsList.includes(val)) { tagsList.push(val); input.value = ''; renderTags(); } }
+        document.getElementById('tagInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
+        function removeTag(tag) { tagsList = tagsList.filter(t => t !== tag); renderTags(); }
+        function renderTags() { document.getElementById('tags-container').innerHTML = tagsList.map(t => `<span class="bg-oxblood/10 text-oxblood px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">${t} <button type="button" onclick="removeTag('${t}')" class="hover:text-red-500">&times;</button></span>`).join(''); }
+
+        function processStateChange() {
+            const form = document.getElementById('studio-form'); const data = new FormData(form);
+            const baseVal = parseInt(data.get('baseCanvas')) || 34; const baseNameLabel = document.querySelector(`input[name="baseCanvas"][value="${baseVal}"]`).nextElementSibling.querySelector('h4').textContent;
+            const lang = data.get('lang') || ''; const langCost = lang.includes('+$6') ? 6 : 0;
+            const voc = data.get('vocal') || ''; const vocCost = voc.includes('+$8') ? 8 : 0;
+            const speed = data.get('speed') || 'Standard'; const speedEl = document.querySelector(`input[name="speed"]:checked`); const speedCost = speedEl ? parseInt(speedEl.getAttribute('data-cost')) : 0;
+            
+            const upgrades = []; let upgradesCost = 0;
+            document.querySelectorAll('.upgrade-cb:checked').forEach(cb => { upgradesCost += parseInt(cb.getAttribute('data-cost')); upgrades.push(cb.value); });
+            const total = baseVal + langCost + vocCost + upgradesCost + speedCost;
+
+            const recName = document.getElementById('recipientName').value.trim() || (currentLang==='en'?'Someone Special':'شخص مميز');
+            const sTitleRaw = document.getElementById('songTitle').value.trim() || (currentLang==='en'?'Untitled Masterpiece':'تحفة فنية');
+            document.getElementById('live-recipient').textContent = recName; document.getElementById('live-title').textContent = `"${sTitleRaw}"`;
+            document.getElementById('live-genre').textContent = data.get('genre') || (currentLang==='en'?'Acoustic':'أكوستيك'); document.getElementById('live-lang').textContent = lang.split('(')[0].trim() || 'English';
+
+            const rc = document.getElementById('receipt-items');
+            rc.innerHTML = `<div class="flex justify-between"><span>${dict[currentLang]['receipt_base']}: ${baseNameLabel.split('(')[0]}</span><span class="font-bold">$${baseVal}</span></div>`;
+            if(langCost) rc.innerHTML += `<div class="flex justify-between text-xs text-rosewood mt-1"><span>+ ${dict[currentLang]['receipt_lang']}</span><span>+$${langCost}</span></div>`;
+            if(vocCost) rc.innerHTML += `<div class="flex justify-between text-xs text-rosewood mt-1"><span>+ ${dict[currentLang]['receipt_voc']}</span><span>+$${vocCost}</span></div>`;
+            if(upgrades.length > 0) {
+                upgrades.forEach((u, i) => {
+                    const el = document.querySelectorAll('.upgrade-cb:checked')[i]; const cost = el.getAttribute('data-cost'); const name = el.value;
+                    rc.innerHTML += `<div class="flex justify-between text-xs text-rosewood mt-1"><span>+ ${name}</span><span>+$${cost}</span></div>`;
+                });
+            }
+            if(speedCost) rc.innerHTML += `<div class="flex justify-between text-xs text-rosewood mt-1"><span>+ ${dict[currentLang]['receipt_spd']}</span><span>+$${speedCost}</span></div>`;
+            document.getElementById('live-total').textContent = `$${total}`;
+        }
+        document.getElementById('studio-form').addEventListener('input', processStateChange); document.getElementById('studio-form').addEventListener('change', processStateChange);
+
+        function submitOrder(method) {
+            const form = document.getElementById('studio-form'); const data = new FormData(form); const total = document.getElementById('live-total').textContent;
+            const name = document.getElementById('customerName').value || 'Customer'; const phone = document.getElementById('customerPhone').value || '';
+            const recipient = document.getElementById('recipientName').value || 'Not specified'; const title = document.getElementById('songTitle').value || 'Let Hkayetna name it';
+            const textStory = document.getElementById('storyInput').value || '';
+            let upgradesTxt = Array.from(document.querySelectorAll('.upgrade-cb:checked')).map(cb => cb.value).join(', ') || 'None';
+            
+            let message = `*✨ NEW HKAYETNA ORDER ✨*\n\n*Customer:* ${name}\n*Phone:* ${phone}\n*Payment:* ${data.get('payment')}\n*Total Estimate:* ${total}\n\n`;
+            message += `*-- CANVAS & VIBE --*\n*Base:* $${data.get('baseCanvas')} Canvas\n*Occasion:* ${data.get('occasion')}\n*For:* ${recipient}\n*Title Idea:* ${title}\n*Lang:* ${data.get('lang')}\n*Vocals:* ${data.get('vocal')}\n*Genre:* ${data.get('genre')}\n*Mood:* ${document.getElementById('mood-slider').value} | *Tempo:* ${document.getElementById('tempo-slider').value}\n\n`;
+            message += `*-- STORY --*\n*Format:* ${storyMode === 'voice' ? 'Will send voice note below 👇' : 'Text'}\n`;
+            if (storyMode === 'text' && textStory) message += `*Details:* ${textStory}\n`;
+            if (tagsList.length > 0) message += `*Tags:* ${tagsList.join(', ')}\n`;
+            message += `*Dedication:* ${document.getElementById('dedicationToggle').checked ? 'Yes' : 'No'}\n\n*-- UPGRADES & SPEED --*\n*Add-ons:* ${upgradesTxt}\n*Speed:* ${data.get('speed')}\n`;
+
+            if (method === 'whatsapp') { window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank'); } 
+            else { window.location.href = `mailto:ba662569@gmail.com?subject=New Custom Song Order - ${name}&body=${encodeURIComponent(message)}`; }
+        }
+
+        // -------------------------------------------------------------------
+        // AMBIENT BACKGROUND ENGINE & REAL/SYNTH AUDIO ENGINE
+        // -------------------------------------------------------------------
+        const canvas = document.getElementById('ambient-canvas'); const ctx = canvas.getContext('2d');
+        let width, height; let particles = []; let scrollSpeed = 0; let lastScrollY = window.scrollY;
+        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        window.addEventListener('scroll', () => { scrollSpeed = (window.scrollY - lastScrollY) * 0.05; lastScrollY = window.scrollY; });
+        class Particle {
+            constructor() { this.reset(); this.y = Math.random() * height; }
+            reset() { this.x = Math.random() * width; this.y = height + 50; this.size = Math.random() * 80 + 20; this.speedY = -(Math.random() * 0.5 + 0.1); this.speedX = (Math.random() - 0.5) * 0.2; this.opacity = Math.random() * 0.05 + 0.02; this.type = Math.random() > 0.8 ? 'note' : 'orb'; if(this.type === 'note') { this.size = Math.random() * 10 + 5; this.opacity = Math.random() * 0.1 + 0.05; this.char = ['♪', '♫', '♩'][Math.floor(Math.random() * 3)]; } }
+            update() { this.y += this.speedY - (scrollSpeed * 0.5); this.x += this.speedX + Math.sin(this.y * 0.01) * 0.2; scrollSpeed *= 0.95; if (this.y < -100 || this.x < -100 || this.x > width + 100) this.reset(); }
+            draw() { ctx.save(); if (this.type === 'orb') { const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size); gradient.addColorStop(0, `rgba(74, 4, 4, ${this.opacity})`); gradient.addColorStop(1, `rgba(74, 4, 4, 0)`); ctx.fillStyle = gradient; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } else { ctx.fillStyle = `rgba(74, 4, 4, ${this.opacity})`; ctx.font = `${this.size}px Arial`; ctx.fillText(this.char, this.x, this.y); } ctx.restore(); }
+        }
+        for (let i = 0; i < 40; i++) particles.push(new Particle());
+        function animateCanvas() { ctx.clearRect(0, 0, width, height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateCanvas); }
+        animateCanvas();
+
+        let audioCtx; let activeOscillators = []; let currentlyPlayingBtn = null; let globalAudio = null;
+        function stopAudioEngine() {
+            if(globalAudio) { globalAudio.pause(); globalAudio = null; }
+            activeOscillators.forEach(osc => { try { osc.stop(); } catch(e){} }); activeOscillators = [];
+            document.querySelectorAll('.audio-visualizer').forEach(el => el.classList.remove('playing'));
+            document.querySelectorAll('.play-icon, .hero-play-icon').forEach(icon => icon.setAttribute('data-lucide', 'play'));
+            document.querySelectorAll('.vinyl-record').forEach(el => el.classList.add('paused'));
+            lucide.createIcons(); currentlyPlayingBtn = null;
+        }
+        function playSynthChord() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const freqs = [329.63, 415.30, 493.88, 622.25]; const masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0, audioCtx.currentTime); masterGain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.5); masterGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 8);
+            masterGain.connect(audioCtx.destination);
+            freqs.forEach(freq => { const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.frequency.value = freq; osc.connect(masterGain); osc.start(); activeOscillators.push(osc); });
+            setTimeout(stopAudioEngine, 8000);
+        }
+
+        window.toggleAudio = function(btnElement) {
+            const visualizer = btnElement.closest('.glass-panel').querySelector('.audio-visualizer');
+            const icon = btnElement.querySelector('.play-icon');
+            const mp3Src = btnElement.getAttribute('data-mp3');
+            if (currentlyPlayingBtn === btnElement) { stopAudioEngine(); } 
+            else { 
+                stopAudioEngine(); currentlyPlayingBtn = btnElement; icon.setAttribute('data-lucide', 'square'); if(visualizer) visualizer.classList.add('playing');
+                if(mp3Src) { globalAudio = new Audio(mp3Src); globalAudio.play().catch(e=>console.log("Audio play error", e)); globalAudio.onended = stopAudioEngine; } else { playSynthChord(); }
+                lucide.createIcons(); 
+            }
+        };
+
+        window.toggleHeroVinyl = function(cardElement) {
+            const vinyl = cardElement.querySelector('.vinyl-record'); const icon = cardElement.querySelector('.hero-play-icon');
+            const mp3Src = cardElement.getAttribute('data-mp3');
+            if (currentlyPlayingBtn === cardElement) { stopAudioEngine(); } 
+            else { 
+                stopAudioEngine(); currentlyPlayingBtn = cardElement; vinyl.classList.remove('paused'); icon.setAttribute('data-lucide', 'square'); 
+                if(mp3Src) { globalAudio = new Audio(mp3Src); globalAudio.play().catch(e=>console.log("Audio play error", e)); globalAudio.onended = stopAudioEngine; } else { playSynthChord(); }
+                lucide.createIcons(); 
+            }
+        };
+
+    </script>
+</body>
+</html>
